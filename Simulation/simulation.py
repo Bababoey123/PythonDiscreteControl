@@ -88,7 +88,7 @@ class TFSimulator:
 class HybridControlLoop:
     def __init__(self,StateSpaceModel:StateSpaceModel,controller,config_file):
         ## for continuous integration
-        self.dt_plant=1e-4
+        self.dt_plant=1e-5
         ## state space models
         self.A=StateSpaceModel.A.astype(float)
         self.B=StateSpaceModel.B.astype(float)
@@ -123,17 +123,16 @@ class HybridControlLoop:
                 
         return Logger
     def run_impulse_respone(self,X_0,Logger:SimLog)->SimLog:
-        N_substep=int(self.config_file.dt/self.dt_plant) ## number of substeps between each controller update
+        
         X=np.asarray(X_0,dtype=float)
         
         t = 0.0
-        dt_control = self.config_file.dt
         u = np.array([[0.0]], dtype=float) #initial control input
     
         while t<self.config_file.T:
             ## impulse u
-            if t==0: u = np.array([[1.0]], dtype=float)
-            else: u=  u = np.array([[0.0]], dtype=float)
+            if t==0: u =np.array([[1.0]], dtype=float)
+            else: u=np.array([[0.0]], dtype=float)
             ##
             x_dot=self.A @ X + self.B @ u
             ## simple forward euler 
@@ -146,7 +145,26 @@ class HybridControlLoop:
                  break
                 
         return Logger
-
+    def run_step_response(self,X_0,Logger:SimLog)->SimLog:
+        
+        X=np.asarray(X_0,dtype=float)
+        
+        t = 0.0
+        u = np.array([[1.0]], dtype=float) #initial control input
+    
+        while t<self.config_file.T:
+            
+            x_dot=self.A @ X + self.B @ u
+            ## simple forward euler 
+            X+= self.dt_plant*x_dot
+            y=self.C @ X
+            ## update time 
+            t+=self.dt_plant
+            Logger.log(t,y,u)
+            if t >= self.config_file.T:
+                 break
+                
         return Logger
+
         
         

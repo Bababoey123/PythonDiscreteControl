@@ -34,11 +34,6 @@ def run_discrete_control_sim(
         e = r - y
         u = controller_sim.step(e)
 
-        if k == 0:
-            print("y0:", y)
-            print("e0:", e)
-            print("u0:", u)
-
         logger.log(k * config_file.dt, y, u)
 
     return logger
@@ -55,17 +50,13 @@ def run_impulse_response_sim(
     y = y_0
 
     plant_sim.reset(y_0)
-
-    for k in range(N):
+    logger.log(0, np.array([y]), np.array([u]))
+    for k in range(0,N):
         
         u = 1.0/config_file.dt if k == 0 else 0.0
         y = plant_sim.step(u)
-        if k == 0:
-            print("y1:", y)
-            print("u0:", u)
-        
 
-        logger.log(k * config_file.dt, y, np.array([u]))
+        logger.log((k+1) * config_file.dt, y, np.array([u]))
 
     return logger
 def run_step_response_sim(
@@ -79,14 +70,13 @@ def run_step_response_sim(
 
     u = 1.0
     y = y_0
-
     plant_sim.reset(y_0)
-
-    for k in range(N):
+    logger.log(0, np.array([y]), np.array([u]))
+    for k in range(0,N):
         
     
         y = plant_sim.step(u)
        
-        logger.log(k * config_file.dt, y, np.array([u]))
+        logger.log((k+1) * config_file.dt, y, np.array([u]))
 
     return logger

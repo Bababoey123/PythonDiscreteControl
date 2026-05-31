@@ -105,15 +105,15 @@ logger_hybrid = hybrid_loop.run_continuous_control_loop(
 
 plt.figure()
 
-plt.plot(t, y_lib, label="Library TF")
-plt.plot(
+plt.step(t, y_lib, label="Library TF")
+plt.step(
     logger_discrete.t_hist,
     logger_discrete.y_hist,
     color='blue',
     linewidth=2,
     label="Discrete Simulation"
 )
-plt.plot(
+plt.step(
     logger_hybrid.t_hist,
     logger_hybrid.y_hist,
     color='red',
@@ -134,14 +134,13 @@ plt.show()
 impulse_logger=SimLog()
 impulse_logger=run_impulse_response_sim(plant_sim,ballbeam_config,0.0,impulse_logger)
 
-print('own')
-for k in range(10):
-    print(k, impulse_logger.y_hist[k])
 
 plt.figure()
-plt.plot(
+plt.step(
     impulse_logger.t_hist,
     impulse_logger.y_hist,
+    linestyle='-',
+    linewidth=3,
     label="Impulse Sim"
 )
 
@@ -159,32 +158,34 @@ t = np.arange(
 
 _, y_lib = ct.impulse_response(model.Tf_dis, t)
 
-print('lib')
-for k in range(10):
-    print(k, y_lib[k])
 
-plt.plot(
+plt.step(
     t,
     y_lib,
-    linestyle='dashed',
+    linestyle=':',
+    linewidth=3,
     label="Impulse Lib"
 )
 plt.grid()
+plt.xlabel('temps[s]')
+plt.ylabel('position[m]')
 plt.legend()
+plt.title('Comparaison des réponses impulsionelles')
 plt.show()
 
+
+print(y_lib[:5])
+print(impulse_logger.y_hist[:5])
+print(impulse_logger.y_hist[1:6])
 # =============================================================================
 #  Step Response Simulator
 # =============================================================================
 impulse_logger=SimLog()
 impulse_logger=run_step_response_sim(plant_sim,ballbeam_config,0.0,impulse_logger)
 
-print('own')
-for k in range(10):
-    print(k, impulse_logger.y_hist[k])
 
 plt.figure()
-plt.plot(
+plt.step(
     impulse_logger.t_hist,
     impulse_logger.y_hist,
     linewidth=3,
@@ -205,11 +206,7 @@ t = np.arange(
 
 _, y_lib = ct.step_response(model.Tf_dis, t)
 
-print('lib')
-for k in range(10):
-    print(k, y_lib[k])
-
-plt.plot(
+plt.step(
     t,
     y_lib,
     linestyle=':',
@@ -217,6 +214,8 @@ plt.plot(
     label="Step Lib"
 )
 plt.grid()
-plt.title('Comparaison des réponses inditielles')
+plt.title('Comparaison des réponses indicielles')
+plt.xlabel('temps[s]')
+plt.ylabel('position[m]')
 plt.legend()
 plt.show()
