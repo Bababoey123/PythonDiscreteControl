@@ -11,7 +11,8 @@ class DiscretePID:
         self.dt=dt
         self.Max_actuation=Max_actuation
 
-        self.PID_TF,self.PID_num,self.PID_den=self.As_TransferFunction()
+        self.PID_TF_dis,self.PID_num,self.PID_den=self.As_TransferFunction()
+        self.PID_TF_cont=ct.tf([kp**2,kp,ki],[1,0])
         self.e_hist = np.zeros(len(self.PID_num))
         self.u_hist = np.zeros(len(self.PID_den)-1)
         return
