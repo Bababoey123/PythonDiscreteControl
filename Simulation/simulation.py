@@ -75,7 +75,7 @@ class TFSimulator:
 class HybridSim:
     """Provides the tools for the setup and simulation of a discrete controller and a coninuous plant
     """
-    def __init__(self,StateSpaceModel:StateSpaceModel,controller ,config_file):
+    def __init__(self,StateSpaceModel:StateSpaceModel,config_file):
         ## for continuous integration
         """Initialises the simulator with the continuous sim and discrete transfer function of the controller, needs improvement for RST
 
@@ -92,95 +92,8 @@ class HybridSim:
         ##
         self.config_file=config_file
         ##
-        self.controller=controller
-        self.controller_sim=TFSimulator(self.controller.PID_TF_dis,0)
         return
-    def run_continuous_control_loop(self,X_0,Logger:SimLog)->SimLog:
-        """Runs the closed loop continuous simulation 
-
-        Args:
-            X_0 (_type_): Initial state
-            Logger (SimLog): an instance of the SimLog class, preferably new or empty 
-
-        Returns:
-            SimLog: the logger containing the results of the simulation 
-        """
-        N_substep=int(self.config_file.dt/self.dt_plant) ## number of substeps between each controller update
-        X=np.asarray(X_0,dtype=float)
-        
-        t = 0.0
-        dt_control = self.config_file.dt
-        u = np.array([[0.0]], dtype=float) #initial control input
-    
-        while t<self.config_file.T:
-            y_k=self.C @ X
-            u_k=np.array([[self.controller_sim.step(self.controller.reference-y_k)]])
-            
-            for i in range (N_substep):
-                X=self.rk4_step(X,u_k)
-                ## update time 
-                t+=self.dt_plant
-                Logger.log(t,X[0][0],u)
-            if t >= self.config_file.T:
-                break
-                
-        return Logger
-    def run_impulse_respone(self,X_0,Logger:SimLog)->SimLog:
-        """Runs the impulse response of the open loop plant
-
-        Args:
-            X_0 (_type_): Initial state
-            Logger (SimLog): an instance of the SimLog class, preferably new or empty 
-
-        Returns:
-            SimLog: the logger containing the results of the simulation 
-        """
-        X=np.asarray(X_0,dtype=float)
-        
-        t = 0.0
-        u = np.array([[0.0]], dtype=float) #initial control input
-    
-        while t<self.config_file.T:
-            ## impulse u
-            if t==0: u =np.array([[1.0]], dtype=float)
-            else: u=np.array([[0.0]], dtype=float)
-            ##
-            x_dot=self.A @ X + self.B @ u
-            ## simple forward euler 
-            X+= self.dt_plant*x_dot
-            y=self.C @ X
-            ## update time 
-            t+=self.dt_plant
-            Logger.log(t,y,u)
-            if t >= self.config_file.T:
-                 break
-                
-        return Logger
-    def run_step_response(self,X_0,Logger:SimLog)->SimLog:
-        """Runs the step response of the open loop plant
-
-        Args:
-            X_0 (_type_): Initial state
-            Logger (SimLog): an instance of the SimLog class, preferably new or empty 
-
-        Returns:
-            SimLog: the logger containing the results of the simulation 
-        """ 
-        
-        X=np.asarray(X_0,dtype=float)
-        
-        t = 0.0
-        u = np.array([[1.0]], dtype=float) #initial control input
-    
-        while t<self.config_file.T:
-            X=self.rk4_step(X,u)
-            ## update time 
-            t+=self.dt_plant
-            Logger.log(t,X[0][0],u)
-            if t >= self.config_file.T:
-                 break
-                
-        return Logger
+   
     def rk4_step(self,X,u_k):
         """Runge-Kutta 4 solver 
 

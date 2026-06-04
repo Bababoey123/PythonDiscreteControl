@@ -18,13 +18,11 @@ class DiscretePID:
         self.kp=kp
         self.ki=ki
         self.kd=kd
-
-    
         self.dt=dt
 
-        self.PID_TF_dis=self.As_TransferFunction(text_option)
-        self.PID_num=np.asarray(self.PID_TF_dis.num_list[0][0])
-        self.PID_den=np.asarray(self.PID_TF_dis.den_list[0][0])
+        self.transferFunction=self.As_TransferFunction(text_option)
+        self.PID_num=np.asarray(self.transferFunction.num_list[0][0])
+        self.PID_den=np.asarray(self.transferFunction.den_list[0][0])
         self.PID_TF_cont=ct.tf([kp**2,kp,ki],[1,0])
         
         self.e_hist = np.zeros(len(self.PID_num))
