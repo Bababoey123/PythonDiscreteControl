@@ -1,5 +1,7 @@
 ##Ball and BeamSystem
 ## config file with all physical parameters
+"""Contains all the internal parameters of the system and the simulation time variables 
+"""
 
 ## physical parameters based on https://ctms.engin.umich.edu/CTMS/index.php?example=BallBeam&section=ControlStateSpace
 m = 0.111 #kg

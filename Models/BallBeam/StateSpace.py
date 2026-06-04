@@ -2,6 +2,8 @@ import numpy as np
 import control as ct
 
 class StateSpaceModel:
+    """Contains the specific continuous and space-state matrices of the plant 
+    """
     def __init__(self,config_file):
         self.A=np.array([[0,1],[0,0]])
         self.B=np.array([[0],[config_file.H]])

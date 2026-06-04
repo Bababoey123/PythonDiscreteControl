@@ -2,14 +2,25 @@ import numpy as np
 import control as ct
 
 class DiscretePID:
-    def __init__(self,kp,ki,kd,Max_actuation,dt,text_option:str="filtered"):
+    """The discrete PID class can work in both filtered and non-filtered modes
+    Discretised in backwards euler and dosent have output saturation for now  
+    """
+    def __init__(self,kp,ki,kd,dt,text_option:str="filtered"):
+        """Creates an instance of the PID class,
+
+        Args:
+            kp (_float_): Kp represents the strengh of the proportionnal action of the controller
+            ki (_float_): Ki represents the strengh of the integral action of the controller
+            kd (_float_): Kd represents the strengh of the derivative action of the controller
+            dt (_float_): sampling time of the controller, comes form the config file of the plant
+            text_option (str, optional):Option to choose tha filtered dervative action. Defaults to "filtered".
+        """
         self.kp=kp
         self.ki=ki
         self.kd=kd
 
     
         self.dt=dt
-        self.Max_actuation=Max_actuation
 
         self.PID_TF_dis=self.As_TransferFunction(text_option)
         self.PID_num=np.asarray(self.PID_TF_dis.num_list[0][0])
@@ -20,9 +31,16 @@ class DiscretePID:
         self.u_hist = np.zeros(len(self.PID_den)-1)
         return
     def setReference(self,r):
+        """Sets the reference of the PID controller
+
+        Args:
+            r (_float_): the reference (often 1.0)
+        """
         self.reference=r
         return
     def reset(self):
+        """resets the error and the input history of the controller, isnt really needed 
+        """
         self.e_hist = np.zeros(len(self.PID_num))
         self.u_hist = np.zeros(len(self.PID_den)-1)
         return
@@ -30,6 +48,14 @@ class DiscretePID:
   
     
     def As_TransferFunction(self,text_option:str):
+        """Computes the coeficients of the discrete transfer function. Carefull, ct.tf takes arrays as coeficients on z^-1
+
+        Args:
+            text_option (str): the option to chosse the derivative filter
+
+        Returns:
+            The python-control transfer function object of the apropriate PID controller
+        """
         
         if text_option=="filtered" :
             N=50

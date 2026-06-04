@@ -4,44 +4,18 @@ import control as ct
 from Models.BallBeam.StateSpace import StateSpaceModel
 from Metrics_Plotting.SimLog import SimLog
 
-class Simulator:
-    def __init__(self,model,X0):
-        self.model=model ## in state space or the transfer function
-        self.X=X0
-        self.u_hist = np.zeros(len(self.model.num_dis))
-        self.y_hist = np.zeros(len(self.model.den_dis)-1)
-        self.y_hist[0]=self.X[0,0]       
-        return
-    def step(self,u):
-        ## takes state space or tranfer function 
-        if isinstance(self.model,StateSpaceModel):
-            self.X=self.model.Ad @ self.X + self.model.Bd @ u
-            y=self.model.Cd @ self.X 
-            return y
-        elif self.model.Tf_dis.isdtime:
-            self.u_hist[1:] = self.u_hist[:-1]
-            # all my elements exept the first one<= all my elements exept the last one 
-            self.u_hist[0] = u
-            #store first element
 
-            y = np.dot(self.model.num_dis,self.u_hist)
-            # dot product between the coeficients list and the u hist list 
-            # implements b0u[k]+b1u[k-1].....
-            y -= np.dot(self.model.den_dis[1:], self.y_hist)
-            # dot product between the coeficients list and the u hist list 
-            # implements a1y[k-1]+b2u[k-2].....
-
-            y /= self.model.den_dis[0] # divide by a0 to get y[k]
-
-            self.y_hist[1:] = self.y_hist[:-1]
-            #all my elements exept the first one<= all my elements exept the last one 
-            self.y_hist[0] = y
-            #strore first element
-
-            return y
 class TFSimulator:
+    """Calculates steps of a discrete transfer functions
+    """
     ## simulates the trasfer function using difference:
     def __init__(self,tf,X_0):
+        """_summary_
+
+        Args:
+            tf (ct.tf()): The discrete transfer function genrated by python-control
+            X_0 (np.array([[x],[y]])): the initial state of the plant
+        """
         self.num_dis=np.asarray(tf.num_list[0][0])
         self.den_dis=np.asarray(tf.den_list[0][0])
 
@@ -53,6 +27,11 @@ class TFSimulator:
 
         #self.y_hist[0]=y_0
     def reset(self,X_0):
+        """Resets the states of the plant, useful for a new simulation using the same plant 
+
+        Args:
+            X_0 (np.array([[x],[y]])): the initial state of the plant
+        """
         self.u_hist = np.zeros(len(self.num_dis))
         self.y_hist = np.zeros(len(self.den_dis)-1)
         y0 = np.asarray(X_0).reshape(-1)[0]
@@ -61,6 +40,14 @@ class TFSimulator:
     
         return
     def step(self,u):
+        """Calculates the next step y[k](y[k-1],y[k-2],....,u[k],u[k-1],...)
+
+        Args:
+            u (float): the input of the Transfer function
+
+        Returns:
+            y(float):the output of the Transfer function 
+        """
         self.u_hist[1:] = self.u_hist[:-1]
         # all my elements exept the first one<= all my elements exept the last one 
         self.u_hist[0] = float(u)
@@ -85,9 +72,18 @@ class TFSimulator:
         #strore first element
 
         return y
-class HybridControlLoop:
+class HybridSim:
+    """Provides the tools for the setup and simulation of a discrete controller and a coninuous plant
+    """
     def __init__(self,StateSpaceModel:StateSpaceModel,controller ,config_file):
         ## for continuous integration
+        """Initialises the simulator with the continuous sim and discrete transfer function of the controller, needs improvement for RST
+
+        Args:
+            StateSpaceModel (StateSpaceModel): Contains the matrices specific for the system simulated
+            controller (_type_): A controller must have a reference internal varaible and discrete transfer functions 
+            config_file (_type_): The configurationfile for the system, has the simulation time as T and sampling time dt
+        """
         self.dt_plant=1e-3
         ## state space models
         self.A=StateSpaceModel.A.astype(float)
@@ -100,6 +96,15 @@ class HybridControlLoop:
         self.controller_sim=TFSimulator(self.controller.PID_TF_dis,0)
         return
     def run_continuous_control_loop(self,X_0,Logger:SimLog)->SimLog:
+        """Runs the closed loop continuous simulation 
+
+        Args:
+            X_0 (_type_): Initial state
+            Logger (SimLog): an instance of the SimLog class, preferably new or empty 
+
+        Returns:
+            SimLog: the logger containing the results of the simulation 
+        """
         N_substep=int(self.config_file.dt/self.dt_plant) ## number of substeps between each controller update
         X=np.asarray(X_0,dtype=float)
         
@@ -121,7 +126,15 @@ class HybridControlLoop:
                 
         return Logger
     def run_impulse_respone(self,X_0,Logger:SimLog)->SimLog:
-        
+        """Runs the impulse response of the open loop plant
+
+        Args:
+            X_0 (_type_): Initial state
+            Logger (SimLog): an instance of the SimLog class, preferably new or empty 
+
+        Returns:
+            SimLog: the logger containing the results of the simulation 
+        """
         X=np.asarray(X_0,dtype=float)
         
         t = 0.0
@@ -144,6 +157,15 @@ class HybridControlLoop:
                 
         return Logger
     def run_step_response(self,X_0,Logger:SimLog)->SimLog:
+        """Runs the step response of the open loop plant
+
+        Args:
+            X_0 (_type_): Initial state
+            Logger (SimLog): an instance of the SimLog class, preferably new or empty 
+
+        Returns:
+            SimLog: the logger containing the results of the simulation 
+        """ 
         
         X=np.asarray(X_0,dtype=float)
         
@@ -160,8 +182,22 @@ class HybridControlLoop:
                 
         return Logger
     def rk4_step(self,X,u_k):
+        """Runge-Kutta 4 solver 
+
+        Args:
+            X (_type_): X[k-1]
+            u_k (_type_): input of the system 
+        """
         
         def function(X):
+            """space state derivative calculation 
+
+            Args:
+                X (_type_): the vector
+
+            Returns:
+                _type_: the derivative
+            """
             return self.A @ X + self.B @ u_k 
         k1=function(X)
         k2=function(X+self.dt_plant*0.5*k1)

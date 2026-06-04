@@ -1,3 +1,6 @@
+  IN THE DISCRETE PID
+  
+  
   def compute(self,y):
         #error 
         error=self.reference-y.item()
@@ -24,3 +27,43 @@
         #all my elements exept the first one<= all my elements exept the last one 
         #strore first element
         return np.array([[u]])
+
+
+IN THE SIMULATORS 
+
+class Simulator:
+    def __init__(self,model,X0):
+       
+        self.model=model ## in state space or the transfer function
+        self.X=X0
+        self.u_hist = np.zeros(len(self.model.num_dis))
+        self.y_hist = np.zeros(len(self.model.den_dis)-1)
+        self.y_hist[0]=self.X[0,0]       
+        return
+    def step(self,u):
+        ## takes state space or tranfer function 
+        if isinstance(self.model,StateSpaceModel):
+            self.X=self.model.Ad @ self.X + self.model.Bd @ u
+            y=self.model.Cd @ self.X 
+            return y
+        elif self.model.Tf_dis.isdtime:
+            self.u_hist[1:] = self.u_hist[:-1]
+            # all my elements exept the first one<= all my elements exept the last one 
+            self.u_hist[0] = u
+            #store first element
+
+            y = np.dot(self.model.num_dis,self.u_hist)
+            # dot product between the coeficients list and the u hist list 
+            # implements b0u[k]+b1u[k-1].....
+            y -= np.dot(self.model.den_dis[1:], self.y_hist)
+            # dot product between the coeficients list and the u hist list 
+            # implements a1y[k-1]+b2u[k-2].....
+
+            y /= self.model.den_dis[0] # divide by a0 to get y[k]
+
+            self.y_hist[1:] = self.y_hist[:-1]
+            #all my elements exept the first one<= all my elements exept the last one 
+            self.y_hist[0] = y
+            #strore first element
+
+            return y
