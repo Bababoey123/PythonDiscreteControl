@@ -86,9 +86,9 @@ class TFSimulator:
 
         return y
 class HybridControlLoop:
-    def __init__(self,StateSpaceModel:StateSpaceModel,controller,config_file):
+    def __init__(self,StateSpaceModel:StateSpaceModel,controller ,config_file):
         ## for continuous integration
-        self.dt_plant=1e-5
+        self.dt_plant=1e-3
         ## state space models
         self.A=StateSpaceModel.A.astype(float)
         self.B=StateSpaceModel.B.astype(float)
@@ -97,6 +97,7 @@ class HybridControlLoop:
         self.config_file=config_file
         ##
         self.controller=controller
+        self.controller_sim=TFSimulator(self.controller.PID_TF_dis,0)
         return
     def run_continuous_control_loop(self,X_0,Logger:SimLog)->SimLog:
         N_substep=int(self.config_file.dt/self.dt_plant) ## number of substeps between each controller update
@@ -107,17 +108,14 @@ class HybridControlLoop:
         u = np.array([[0.0]], dtype=float) #initial control input
     
         while t<self.config_file.T:
-            y=self.C @ X
-            u=self.controller.compute(y)
+            y_k=self.C @ X
+            u_k=np.array([[self.controller_sim.step(self.controller.reference-y_k)]])
             
             for i in range (N_substep):
-                x_dot=self.A @ X + self.B @ u
-                ## simple forward euler 
-                X+= self.dt_plant*x_dot
-                y=self.C @ X
+                X=self.rk4_step(X,u_k)
                 ## update time 
                 t+=self.dt_plant
-                Logger.log(t,y,u)
+                Logger.log(t,X[0][0],u)
             if t >= self.config_file.T:
                 break
                 
@@ -153,18 +151,22 @@ class HybridControlLoop:
         u = np.array([[1.0]], dtype=float) #initial control input
     
         while t<self.config_file.T:
-            
-            x_dot=self.A @ X + self.B @ u
-            ## simple forward euler 
-            X+= self.dt_plant*x_dot
-            y=self.C @ X
+            X=self.rk4_step(X,u)
             ## update time 
             t+=self.dt_plant
-            Logger.log(t,y,u)
+            Logger.log(t,X[0][0],u)
             if t >= self.config_file.T:
                  break
                 
         return Logger
-
+    def rk4_step(self,X,u_k):
         
+        def function(X):
+            return self.A @ X + self.B @ u_k 
+        k1=function(X)
+        k2=function(X+self.dt_plant*0.5*k1)
+        k3=function(X+0.5*self.dt_plant*k2)
+        k4=function(X+self.dt_plant*k3)
+        
+        return X +self.dt_plant/6*(k1+2*k2+2*k3+k4)
         
