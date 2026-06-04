@@ -1,8 +1,8 @@
 import numpy as np
 import control as ct
 
-from Models.BallBeam.StateSpace import StateSpaceModel
-from Metrics_Plotting.SimLog import SimLog
+from ..Models.BallBeam.StateSpace import StateSpaceModel
+from ..Metrics_Plotting.SimLog import SimLog
 
 
 class TFSimulator:

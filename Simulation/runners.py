@@ -1,11 +1,11 @@
-from Models.BallBeam import ballbeam_config
-from Models.BallBeam.StateSpace import StateSpaceModel
-from Models.BallBeam.TransferFunctions import TransferFunctionModel
+from ..Models.BallBeam import ballbeam_config
+from ..Models.BallBeam.StateSpace import StateSpaceModel
+from ..Models.BallBeam.TransferFunctions import TransferFunctionModel
 
-from Simulation.simulation import TFSimulator
-from Simulation.simulation import HybridSim
+from ..Simulation.simulation import TFSimulator
+from ..Simulation.simulation import HybridSim
 
-from Metrics_Plotting.SimLog import SimLog
+from ..Metrics_Plotting.SimLog import SimLog
 
 import numpy as np
 import control as ct
@@ -92,12 +92,13 @@ def run_continuous_control_loop(
     Args:
         HybridSim (HybridSim): The HybridSim object, initialised withe the plants model
         controller: The controller object, must have a .transerFunction with his discrete tranfer function
-        X_0 (_type_): _description_
-        Logger (SimLog): _description_
+        r: The reference for the controller
+        X_0: The initial state
+        Logger (SimLog): The empty SimLog() instance of the simulation
         
 
     Returns:
-        SimLog: _description_
+        SimLog: The SimLog instance passed as input, now with the data of the simulation
     """
     controller.setReference(r)
     controller_sim=TFSimulator(controller.transferFunction,0)
@@ -125,7 +126,7 @@ def run_continuous_impulse_respone(HybridSim,X_0,Logger:SimLog)->SimLog:
         """Runs the impulse response of the open loop plant
 
         Args:
-             HybridSim (HybridSim): An HybridSim instance initalised with the plants space state model
+            HybridSim (HybridSim): An HybridSim instance initalised with the plants space state model
             X_0 (_type_): Initial state
             Logger (SimLog): an instance of the SimLog class, preferably new or empty 
 
