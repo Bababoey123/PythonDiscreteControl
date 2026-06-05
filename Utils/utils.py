@@ -1,4 +1,4 @@
-from ..Metrics_Plotting import SimLog
+from Metrics_Plotting import SimLog
 import csv
 def as_csv(csv_title:str,logs):
     with open(csv_title+'.csv', 'w', newline='') as csvfile:

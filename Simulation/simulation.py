@@ -1,8 +1,8 @@
 import numpy as np
 import control as ct
 
-from ..Models.BallBeam.StateSpace import StateSpaceModel
-from ..Metrics_Plotting.SimLog import SimLog
+from Models.BallBeam.StateSpace import StateSpaceModel
+from Metrics_Plotting.SimLog import SimLog
 
 
 class TFSimulator:
@@ -20,9 +20,15 @@ class TFSimulator:
         self.den_dis=np.asarray(tf.den_list[0][0])
 
         self.u_hist = np.zeros(len(self.num_dis))
-        self.y_hist = np.zeros(len(self.den_dis)-1)
-        y0 = np.asarray(X_0).reshape(-1)[0]
-        self.y_hist[0] = float(y0)
+        
+        ## for handling cases where the numearator or the denominator equal to 1
+        if len(self.den_dis) > 1:
+            self.y_hist = np.zeros(len(self.den_dis)-1)
+            y0 = np.asarray(X_0).reshape(-1)[0]
+            self.y_hist[0] = float(y0)
+        else:
+             self.y_hist = np.array([])
+        
        
 
         #self.y_hist[0]=y_0
@@ -33,9 +39,14 @@ class TFSimulator:
             X_0 (np.array([[x],[y]])): the initial state of the plant
         """
         self.u_hist = np.zeros(len(self.num_dis))
-        self.y_hist = np.zeros(len(self.den_dis)-1)
-        y0 = np.asarray(X_0).reshape(-1)[0]
-        self.y_hist[0] = float(y0)
+        ## for handling cases where the numearator or the denominator equal to 1
+        if len(self.den_dis) > 1:
+            self.y_hist = np.zeros(len(self.den_dis)-1)
+            y0 = np.asarray(X_0).reshape(-1)[0]
+            self.y_hist[0] = float(y0)
+        else:
+             self.y_hist = np.array([])
+        
        
     
         return
@@ -73,7 +84,7 @@ class TFSimulator:
 
         return y
 class HybridSim:
-    """Provides the tools for the setup and simulation of a discrete controller and a coninuous plant
+    """Provides the tools for the setup and simulation of a discrete controller and a continuous plant
     """
     def __init__(self,StateSpaceModel:StateSpaceModel,config_file):
         ## for continuous integration

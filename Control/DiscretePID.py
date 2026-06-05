@@ -1,9 +1,11 @@
 import numpy as np
 import control as ct
 
+from Simulation.simulation import TFSimulator
+
 class DiscretePID:
     """The discrete PID class can work in both filtered and non-filtered modes
-    Discretised in backwards euler and dosent have output saturation for now  
+    Discretised in backwards euler and dosent have output saturation for now. Contains also the apropriate RST polynomials
     """
     def __init__(self,kp,ki,kd,dt,text_option:str="filtered"):
         """Creates an instance of the PID class,
@@ -20,13 +22,14 @@ class DiscretePID:
         self.kd=kd
         self.dt=dt
 
+        ### classical PID ###
         self.transferFunction=self.As_TransferFunction(text_option)
-        self.PID_num=np.asarray(self.transferFunction.num_list[0][0])
-        self.PID_den=np.asarray(self.transferFunction.den_list[0][0])
+        self.controller_sim=TFSimulator(self.transferFunction,0)
         self.PID_TF_cont=ct.tf([kp**2,kp,ki],[1,0])
         
-        self.e_hist = np.zeros(len(self.PID_num))
-        self.u_hist = np.zeros(len(self.PID_den)-1)
+        ### As RST ###
+        self.As_RST(text_option)
+    
         return
     def setReference(self,r):
         """Sets the reference of the PID controller
@@ -36,14 +39,9 @@ class DiscretePID:
         """
         self.reference=r
         return
-    def reset(self):
-        """resets the error and the input history of the controller, isnt really needed 
-        """
-        self.e_hist = np.zeros(len(self.PID_num))
-        self.u_hist = np.zeros(len(self.PID_den)-1)
-        return
-
-  
+    def step(self,y):
+        e=self.reference-y
+        return self.controller_sim.step(e)
     
     def As_TransferFunction(self,text_option:str):
         """Computes the coeficients of the discrete transfer function. Carefull, ct.tf takes arrays as coeficients on z^-1
@@ -69,3 +67,10 @@ class DiscretePID:
             b2=self.kd/self.dt
             PID=ct.TransferFunction([b0,b1,b2],[1,-1],self.dt)
             return PID
+    def As_RST(self,text_option:str):
+        num = self.transferFunction.num_list[0][0]
+        den = self.transferFunction.den_list[0][0]
+        self.R= ct.tf(num,[1],self.dt)
+        self.T=self.R
+        self.S= ct.tf(den,[1],self.dt)
+        return

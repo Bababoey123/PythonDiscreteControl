@@ -1,11 +1,15 @@
-from ..Models.BallBeam import ballbeam_config
-from ..Models.BallBeam.StateSpace import StateSpaceModel
-from ..Models.BallBeam.TransferFunctions import TransferFunctionModel
+"""The most imporotant port of the library, contains the functions that run differen simulations, knowing the iputs and ouptus of each is mandatory to use the library
+"""
 
-from ..Simulation.simulation import TFSimulator
-from ..Simulation.simulation import HybridSim
 
-from ..Metrics_Plotting.SimLog import SimLog
+from Models.BallBeam import ballbeam_config
+from Models.BallBeam.StateSpace import StateSpaceModel
+from Models.BallBeam.TransferFunctions import TransferFunctionModel
+
+from Simulation.simulation import TFSimulator
+from Simulation.simulation import HybridSim
+
+from Metrics_Plotting.SimLog import SimLog
 
 import numpy as np
 import control as ct
@@ -13,30 +17,30 @@ import control as ct
 
 def run_discrete_control(
     plant_sim: TFSimulator,
-    controller_sim: TFSimulator,
+    controller,
     config_file,
     r: float,
     y_0: float,
     logger: SimLog
 ) -> SimLog:
-
+    
     N = int(config_file.T / config_file.dt)
 
     u = 0.0
     y = y_0
 
     plant_sim.reset(y_0)
-    controller_sim.reset(0)
 
     for k in range(N):
 
         y = plant_sim.step(u)
         e = r - y
-        u = controller_sim.step(e)
+        u = controller.step(e)
 
         logger.log(k * config_file.dt, y, u)
 
     return logger
+
 def run_discrete_impulse_response(
     plant_sim: TFSimulator,
     config_file,
@@ -101,7 +105,7 @@ def run_continuous_control_loop(
         SimLog: The SimLog instance passed as input, now with the data of the simulation
     """
     controller.setReference(r)
-    controller_sim=TFSimulator(controller.transferFunction,0)
+    
     N_substep=int(HybridSim.config_file.dt/HybridSim.dt_plant) ## number of substeps between each controller update
     X=np.asarray(X_0,dtype=float)
         
@@ -111,7 +115,7 @@ def run_continuous_control_loop(
     
     while t<HybridSim.config_file.T:
         y_k=HybridSim.C @ X
-        u_k=np.array([[controller_sim.step(controller.reference-y_k)]])
+        u_k=np.array([[controller.step(y_k)]])
             
         for i in range (N_substep):
             X=HybridSim.rk4_step(X,u_k)
