@@ -23,6 +23,19 @@ def run_discrete_control(
     y_0: float,
     logger: SimLog
 ) -> SimLog:
+    """Computes the discrete closed loop response of the plant and it's controller, returns the logger
+
+    Args:
+        plant_sim (TFSimulator): A TFSimulator instance initalised with the plant's model
+        controller (_type_): a controller object, must include step and reset methods
+        config_file (_type_): configuration file of the plant, contains the simulations lengh and sampling time 
+        r (float): the reference 
+        y_0 (float): ititial state 
+        logger (SimLog): the SimLog() logger for data recording
+
+    Returns:
+        SimLog: The initial logger, now with all the data 
+    """
     
     N = int(config_file.T / config_file.dt)
 
@@ -47,6 +60,18 @@ def run_discrete_impulse_response(
     y_0: float,
     logger: SimLog
 ) -> SimLog:
+    """Computes the discrete impulse response of the plant, returns the logger 
+     Args:
+        plant_sim (TFSimulator): A TFSimulator instance initalised with the plant's model
+        config_file (_type_): configuration file of the plant, contains the simulations lengh and sampling time 
+        y_0 (float): ititial state 
+        logger (SimLog): the SimLog() logger for data recording
+
+    Returns:
+        SimLog: The entry logger, now with all the data 
+
+   
+    """
 
     N = int(config_file.T / config_file.dt)
 
@@ -69,6 +94,16 @@ def run_discrete_step_response(
     y_0: float,
     logger: SimLog
 ) -> SimLog:
+    """Computes the discrete impulse response on the plant
+     Args:
+        plant_sim (TFSimulator): A TFSimulator instance initalised with the plant's model
+        config_file (_type_): configuration file of the plant, contains the simulations lengh and sampling time 
+        y_0 (float): ititial state 
+        logger (SimLog): the SimLog() logger for data recording
+
+    Returns:
+        SimLog: The entry logger, now with all the data 
+    """
 
     N = int(config_file.T / config_file.dt)
 
