@@ -4,13 +4,13 @@ import control as ct
 from Simulation.simulation import TFSimulator
 
 class RSTController:
-    def __init__(self, R, S, T):
+    def __init__(self, R:ct.TransferFunction, S:ct.TransferFunction, T:ct.TransferFunction):
         """Gerenates the transfer function simulators for the R,S and T polynomials
 
         Args:
-            R (TransferFunction): the ct.tf() of the R polynomial
-            S (TransferFunction): the ct.tf() of the S polynomial
-            T (TransferFunction): the ct.ts() od the T polynomial
+            R (ct.TransferFunction): the ct.tf() of the R polynomial
+            S (ct.TransferFunction): the ct.tf() of the S polynomial
+            T (ct.TransferFunction): the ct.ts() od the T polynomial
         """
         self.R_sim = TFSimulator(R, 0)
         self.T_sim = TFSimulator(T, 0)

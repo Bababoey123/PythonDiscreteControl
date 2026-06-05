@@ -43,15 +43,12 @@ def run_discrete_control(
     y = y_0
 
     plant_sim.reset(y_0)
-
     for k in range(N):
-
+        u = controller.step(y)
         y = plant_sim.step(u)
-        e = r - y
-        u = controller.step(e)
-
-        logger.log(k * config_file.dt, y, u)
-
+    
+        logger.log((k+1) * config_file.dt, np.array([y]), np.array([u]))
+        
     return logger
 
 def run_discrete_impulse_response(
@@ -146,7 +143,7 @@ def run_continuous_control_loop(
         
     t = 0.0
     dt_control = HybridSim.config_file.dt
-    u = np.array([[0.0]], dtype=float) #initial control input
+    u_k = np.array([[0.0]], dtype=float) #initial control input
     
     while t<HybridSim.config_file.T:
         y_k=HybridSim.C @ X
@@ -156,7 +153,7 @@ def run_continuous_control_loop(
             X=HybridSim.rk4_step(X,u_k)
             ## update time 
             t+=HybridSim.dt_plant
-            Logger.log(t,X[0][0],u)
+            Logger.log(t,X[0][0],u_k)
             
             if t >= HybridSim.config_file.T:
                 break
