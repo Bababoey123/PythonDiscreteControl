@@ -62,9 +62,7 @@ class RSTController:
         v_k = np.dot(self.T_coeffs, self.r_hist) - np.dot(
             self.R_coeffs, self.y_hist
         )
-    
-        # 4. Reuse your untouched original TFSimulator.step() to compute u[k]
-        # This handles the internal 1/S behavior and properly tracks u_hist
+
         u_k = self.S_block_sim.step(v_k)
         feedforward = np.dot(self.T_coeffs, self.r_hist)
         feedback = np.dot(self.R_coeffs, self.y_hist)
