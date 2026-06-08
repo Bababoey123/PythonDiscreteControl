@@ -80,31 +80,37 @@ def Compute_Desired_RST(Desired_TF, plant_discrete_tf):
 
     S_coeffs = theta[:nS]
     R_coeffs = theta[nS:]
-    S_coeffs = S_coeffs / S_coeffs[0]
-    R_coeffs = R_coeffs / S_coeffs[0]
+
+    # Verify denominator matching for sanity
+    A_cl_check = np.r_[A_cl, np.zeros(M.shape[0] - len(A_cl))] if len(A_cl) < M.shape[0] else A_cl[: M.shape[0]]
+    den_check = np.polyadd(np.polymul(A, S_coeffs), np.polymul(B, R_coeffs))
+    if not np.allclose(den_check, A_cl_check, atol=1e-8):
+        raise ValueError(
+            "RST denominator synthesis failed: A*S + B*R does not equal desired A_cl."
+        )
 
     # ------------------------------------------------------------
     # 4. Compute T correctly from:
     #       B T = B_cl
     # ------------------------------------------------------------
-    # Determine T order safely. If Desired numerator is shorter than plant numerator,
-    # force at least a single coefficient (least-squares will handle approximation).
     nT = max(1, len(B_cl) - len(B) + 1)
 
-    # Build convolution system: B * T = B_cl
-    BT = _conv_matrix(B, nT)
+    # Use exact polynomial division if possible
+    quotient, remainder = np.polydiv(B_cl, B)
+    remainder = np.trim_zeros(np.round(remainder, decimals=12), 'f')
+    if len(remainder) == 0 or np.allclose(remainder, 0, atol=1e-8):
+        T_coeffs = np.trim_zeros(quotient, 'f')
+        if len(T_coeffs) == 0:
+            T_coeffs = np.array([0.0])
+        if len(T_coeffs) < nT:
+            T_coeffs = np.r_[T_coeffs, np.zeros(nT - len(T_coeffs))]
+    else:
+        raise ValueError(
+            "Desired numerator is not achievable with B * T; adjust the desired transfer function or use a different plant model."
+        )
 
-    #Pad ONLY B_cl to match system rows (no S anywhere!)
-    rhs = np.r_[B_cl, np.zeros(BT.shape[0] - len(B_cl))]
-
-    # Solve (with diagnostics on failure)
-    try:
-        T_coeffs = la.lstsq(BT, rhs)[0]
-    except Exception as e:
-        print("--- RST synthesis: error solving for T ---")
-        print("BT shape:", BT.shape)
-        print("rhs length:", len(rhs))
-        raise
+    # If the polynomial division returns higher-order coefficients, keep the full result.
+    nT = len(T_coeffs)
     # ------------------------------------------------------------
     # 5. Transfer functions (match your simulator)
     # ------------------------------------------------------------
