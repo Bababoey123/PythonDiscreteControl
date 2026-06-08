@@ -68,6 +68,6 @@ class RSTController:
         u_k = self.S_block_sim.step(v_k)
         feedforward = np.dot(self.T_coeffs, self.r_hist)
         feedback = np.dot(self.R_coeffs, self.y_hist)
-        print(f"FF: {feedforward:.4f} | FB: {feedback:.4f} | u_before_S: {v_k:.4f}")
+
  
         return u_k

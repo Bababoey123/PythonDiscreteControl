@@ -111,6 +111,18 @@ def Compute_Desired_RST(
     S_tf = ct.tf(S_coeffs/scale, [1], plant_discrete_tf.dt)
     R_tf = ct.tf(R_coeffs/scale, [1], plant_discrete_tf.dt)
     T_tf = ct.tf(T_coeffs, [1], plant_discrete_tf.dt)
+    
+    R = R_coeffs
+    S = S_coeffs
+    T = T_coeffs
+
+    num_cl = np.polymul(B, T)
+    den_cl = np.polyadd(
+    np.polymul(A, S),
+    np.polymul(B, R)
+    )
+
+    H_rst = ct.tf(num_cl, den_cl, plant_discrete_tf.dt)
 
     # Runtime verification printouts
     cl_poles = np.roots(A_cl)
@@ -120,5 +132,5 @@ def Compute_Desired_RST(
     print("S coefficients:", S_coeffs)
     print("R coefficients:", R_coeffs)
     print("T coefficients:", T_coeffs)
-
+    print(H_rst)
     return S_tf, R_tf, T_tf
