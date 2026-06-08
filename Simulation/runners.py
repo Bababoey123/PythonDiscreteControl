@@ -145,15 +145,26 @@ def run_continuous_control_loop(
     dt_control = HybridSim.config_file.dt
     u_k = np.array([[0.0]], dtype=float) #initial control input
     
-    while t<HybridSim.config_file.T:
-        y_k=HybridSim.C @ X
-        u_k=np.array([[controller.step(y_k)]])
+    while t < HybridSim.config_file.T:
+        # 1. Force the output product to extract as a clean scalar float
+        y_matrix = HybridSim.C @ X
+        y_k = float(np.squeeze(y_matrix)) 
+        
+        # 2. Force the controller step output to be a pure float
+        u_scalar = float(controller.step(y_k))
+        
+        # 3. Format the control action array safely for your RK4 block
+        u_k = np.array([[u_scalar]], dtype=float)
             
-        for i in range (N_substep):
-            X=HybridSim.rk4_step(X,u_k)
-            ## update time 
-            t+=HybridSim.dt_plant
-            Logger.log(t,X[0][0],u_k)
+        # 4. Step the continuous plant states forward
+        for i in range(N_substep):
+            X = HybridSim.rk4_step(X, u_k)
+            
+            # Update physical loop clock
+            t += HybridSim.dt_plant
+            
+            # Log as pure NumPy primitives to prevent array accumulation 
+            Logger.log(t, np.array([X[0][0]]), np.array([u_scalar]))
             
             if t >= HybridSim.config_file.T:
                 break

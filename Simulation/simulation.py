@@ -16,19 +16,17 @@ class TFSimulator:
             tf (ct.tf()): The discrete transfer function genrated by python-control
             X_0 (np.array([[x],[y]])): the initial state of the plant
         """
-        self.num_dis=np.asarray(tf.num_list[0][0])
-        self.den_dis=np.asarray(tf.den_list[0][0])
+        self.num_dis = np.asarray(tf.num_list[0][0], dtype=float)
+        self.den_dis = np.asarray(tf.den_list[0][0], dtype=float)
 
         self.u_hist = np.zeros(len(self.num_dis))
-        
-        ## for handling cases where the numearator or the denominator equal to 1
+
         if len(self.den_dis) > 1:
-            self.y_hist = np.zeros(len(self.den_dis)-1)
-            y0 = np.asarray(X_0).reshape(-1)[0]
-            self.y_hist[0] = float(y0)
+            # Initialize past outputs to your initial state value
+            y0 = float(np.asarray(X_0).reshape(-1)[0])
+            self.y_hist = np.full(len(self.den_dis) - 1, y0)
         else:
-             self.y_hist = np.array([])
-        
+            self.y_hist = np.array([])
        
 
         #self.y_hist[0]=y_0

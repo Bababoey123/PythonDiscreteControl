@@ -28,7 +28,7 @@ class DiscretePID:
         self.PID_TF_cont=ct.tf([kp**2,kp,ki],[1,0])
         
         ### As RST ###
-        self.As_RST(text_option)
+        self.As_RST()
     
         return
     def setReference(self,r):
@@ -67,7 +67,9 @@ class DiscretePID:
             b2=self.kd/self.dt
             PID=ct.TransferFunction([b0,b1,b2],[1,-1],self.dt)
             return PID
-    def As_RST(self,text_option:str):
+    def As_RST(self):
+        """Converts the PID transfer function into its respective R,S and T polynomials
+        """
         num = self.transferFunction.num_list[0][0]
         den = self.transferFunction.den_list[0][0]
         self.R= ct.tf(num,[1],self.dt)
