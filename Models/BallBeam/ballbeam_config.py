@@ -12,7 +12,7 @@ d= 0.03
 L=1.0
 
 ## sampling frequency for the controller 
-dt=1/50 #50ms 
+dt=1/100 #50ms 
 ## simulation time 
 T=3#sec
 H =  -m*g*d/L/(J/R**2+m)

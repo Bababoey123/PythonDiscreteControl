@@ -22,13 +22,11 @@ class RSTController:
         self.r_hist = np.zeros(len(self.T_coeffs))
         self.y_hist = np.zeros(len(self.R_coeffs))
 
-        #FSimulator for the 1/S(z) block
-        # This keeps a single, unified history for the control signal u
+        # FSimulator for the 1/S(z) block
         one_over_S = ct.tf([1.0], self.S_coeffs, dt)
         self.S_block_sim = TFSimulator(one_over_S, 0)
-        
+
         self.reference = 0.0
-       
     def setReference(self,r):
         """Sets the reference of the RST controller
 
@@ -37,35 +35,20 @@ class RSTController:
         """
         self.reference=r
         return
-    def step(self,y):
-        """Gereates the control signal u based on the output y and the reference
+    def step(self, y):
 
-        Args:
-            y (_float_): output signal
+        # shift reference history
+        self.r_hist[1:] = self.r_hist[:-1]
+        self.r_hist[0] = self.reference
 
-        Returns:
-           u(_float_): control signal 
-        """
-        # 1. Shift and update reference input history safely
-        if len(self.r_hist) > 1:
-            self.r_hist[1:] = np.copy(self.r_hist[:-1])
-        if len(self.r_hist) > 0:
-            self.r_hist[0] = float(self.reference)
+        # shift output history and include the current measured output
+        self.y_hist[1:] = self.y_hist[:-1]
+        self.y_hist[0] = y
 
-        # 2. Shift and update plant output feedback history safely
-        if len(self.y_hist) > 1:
-            self.y_hist[1:] = np.copy(self.y_hist[:-1])
-        if len(self.y_hist) > 0:
-            self.y_hist[0] = float(y)
+        # compute control law
+        v_k = np.dot(self.T_coeffs, self.r_hist) - np.dot(self.R_coeffs, self.y_hist)
 
-        # 3. Compute the intermediate tracking/feedback mixture: v[k] = T*r - R*y
-        v_k = np.dot(self.T_coeffs, self.r_hist) - np.dot(
-            self.R_coeffs, self.y_hist
-        )
-
+        # S-filter
         u_k = self.S_block_sim.step(v_k)
-        feedforward = np.dot(self.T_coeffs, self.r_hist)
-        feedback = np.dot(self.R_coeffs, self.y_hist)
 
- 
         return u_k

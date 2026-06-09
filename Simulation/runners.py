@@ -38,7 +38,7 @@ def run_discrete_control(
     """
     
     N = int(config_file.T / config_file.dt)
-
+    controller.setReference(r)
     u = 0.0
     y = y_0
 
@@ -152,7 +152,7 @@ def run_continuous_control_loop(
         
         # 2. Force the controller step output to be a pure float
         u_scalar = float(controller.step(y_k))
-        print("u_k-",u_scalar,"y_k-",y_k)
+        #print("u_k-",u_scalar,"y_k-",y_k)
         # 3. Format the control action array safely for your RK4 block
         u_k = np.array([[u_scalar]], dtype=float)
             
