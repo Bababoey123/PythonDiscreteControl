@@ -3,7 +3,7 @@
 
 
 from Models.BallBeam import ballbeam_config
-from Models.BallBeam.StateSpace import StateSpaceModel
+from Models.BallBeam.StateSpace import LinearStateSpaceModel
 from Models.BallBeam.TransferFunctions import TransferFunctionModel
 
 from Simulation.simulation import TFSimulator
@@ -21,7 +21,8 @@ def run_discrete_control(
     config_file,
     r: float,
     y_0: float,
-    logger: SimLog
+    logger: SimLog,
+    Disturb=True
 ) -> SimLog:
     """Computes the discrete closed loop response of the plant and it's controller, returns the logger
 
@@ -44,8 +45,12 @@ def run_discrete_control(
 
     plant_sim.reset(y_0)
     for k in range(N):
+        if Disturb and k*config_file.dt > 3.0:
+                d = np.array([[2.0]])
+        else:
+                d = np.array([[0.0]])
         u = controller.step(y)
-        y = plant_sim.step(u)
+        y = plant_sim.step(u+d)
     
         logger.log((k+1) * config_file.dt, np.array([y]), np.array([u]))
         
@@ -121,7 +126,8 @@ def run_continuous_control_loop(
     controller,
     r,
     X_0,
-    Logger:SimLog
+    Logger:SimLog,
+    Disturb=True
     )->SimLog:
     """Runs the cloed loop hybrid simulation
 
@@ -158,7 +164,13 @@ def run_continuous_control_loop(
             
         # 4. Step the continuous plant states forward
         for i in range(N_substep):
-            X = HybridSim.rk4_step(X, u_k)
+            if Disturb and t > 3.0:
+                d = np.array([[2.0]])
+            else:
+                d = np.array([[0.0]])
+
+            u_plant = u_k + d
+            X = HybridSim.rk4_step(X, u_plant)
             
             # Update physical loop clock
             t += HybridSim.dt_plant
@@ -219,6 +231,7 @@ def run_continuous_step_response(HybridSim,X_0,Logger:SimLog)->SimLog:
         u = np.array([[1.0]], dtype=float) #initial control input
     
         while t<HybridSim.config_file.T:
+            
             X=HybridSim.rk4_step(X,u)
             ## update time 
             t+=HybridSim.dt_plant

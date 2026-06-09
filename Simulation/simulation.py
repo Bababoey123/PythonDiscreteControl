@@ -1,7 +1,7 @@
 import numpy as np
 import control as ct
 
-from Models.BallBeam.StateSpace import StateSpaceModel
+from Models.BallBeam.StateSpace import LinearStateSpaceModel
 from Metrics_Plotting.SimLog import SimLog
 
 
@@ -84,7 +84,7 @@ class TFSimulator:
 class HybridSim:
     """Provides the tools for the setup and simulation of a discrete controller and a continuous plant
     """
-    def __init__(self,StateSpaceModel:StateSpaceModel,config_file):
+    def __init__(self,StateSpaceModel:LinearStateSpaceModel,config_file):
         ## for continuous integration
         """Initialises the simulator with the continuous sim and discrete transfer function of the controller, needs improvement for RST
 

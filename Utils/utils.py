@@ -6,6 +6,7 @@ from scipy.linalg import toeplitz
 from sklearn.preprocessing import scale
 import control as ct
 import csv
+import warnings
 
 
 def _trim(p):
@@ -85,14 +86,22 @@ def Compute_Denominator_Matching_RST(A_cl:list, plant_discrete_tf):
     A_cl = np.r_[A_cl, np.zeros(target_len - len(A_cl))]
 
     poles = np.roots(A_cl)
-    if np.any(np.abs(poles) >= 1.0 - 1e-8):
+    unstable = np.abs(poles) > 1.0 + 1e-8
+    if np.any(unstable):
         raise ValueError(
-            "Desired closed-loop denominator A_cl must have all poles inside the unit circle "
-            "for a bounded discrete step response."
+            "Desired closed-loop denominator A_cl must have all poles strictly outside the unstable region. "
+            "Only poles inside or on the unit circle are supported for denominator matching."
+        )
+
+    if np.any(np.isclose(np.abs(poles), 1.0, atol=1e-8)):
+        warnings.warn(
+            "Desired closed-loop denominator A_cl contains a pole on the unit circle. "
+            "This includes a pure integrator at z=1; closed-loop response may be marginally stable or unbounded for some inputs.",
+            UserWarning
         )
 
     # Solve
-    theta, *_ = la.lstsq(M, A_cl)  
+    theta, *_ = np.linalg.lstsq(M, A_cl, rcond=None)
     # via the least squares method, this gives the most exact approximate solution 
 
     S_coeffs = theta[:nS] # extracting the first coeficients into S
@@ -107,13 +116,22 @@ def Compute_Denominator_Matching_RST(A_cl:list, plant_discrete_tf):
         )
 
     # ------------------------------------------------------------
-    # 4. Compute T resuting in unity steady-state gain 
+    # 4. Compute T
     # ------------------------------------------------------------
     B1 = np.polyval(B, 1)
     Acl1 = np.polyval(A_cl, 1)
 
-    t0 = Acl1 / B1
-    T_coeffs = np.array([t0])
+    if np.isclose(Acl1, 0.0, atol=1e-8):
+        warnings.warn(
+            "Desired closed-loop denominator A_cl contains a pole at z=1. "
+            "A finite DC gain cannot be enforced. Using constant T=1 to preserve the "
+            "reference path and keep the denominator matching behavior."
+        )
+        T_coeffs = np.array([1.0])
+    else:
+        t0 = Acl1 / B1
+        T_coeffs = np.array([t0])
+
     # ------------------------------------------------------------
     # 5. Transfer functions 
     # ------------------------------------------------------------
@@ -138,7 +156,13 @@ def Compute_Denominator_Matching_RST(A_cl:list, plant_discrete_tf):
     print("Numerator coefficients:", num_cl)
     print("Denominator coefficients:", den_cl)
     print(H_cl)
-    print("Closed-loop DC gain:", ct.dcgain(H_cl))
+    if np.isclose(np.polyval(den_cl, 1.0), 0.0, atol=1e-8):
+        print(
+            "Closed-loop DC gain: undefined or infinite because the closed-loop denominator "
+            "has a pole at z=1."
+        )
+    else:
+        print("Closed-loop DC gain:", ct.dcgain(H_cl))
 
     return S_tf, R_tf, T_tf
 def Compute_Desired_RST(Desired_TF, plant_discrete_tf):
@@ -205,7 +229,7 @@ def Compute_Desired_RST(Desired_TF, plant_discrete_tf):
         )
 
     # Solve
-    theta, *_ = la.lstsq(M, A_cl)  # type: ignore[assignment]
+    theta, *_ = np.linalg.lstsq(M, A_cl, rcond=None)
     # via the least squares method, this gives the most exact approximate solution 
 
     S_coeffs = theta[:nS] # extracting the first coeficients into S
