@@ -309,37 +309,47 @@ def Place_real_radius(plant_tf, pole_radius=0.85, steady_gain=1.0):
     B_cl = scale * B
 
     return ct.tf(B_cl, A_cl, plant_tf.dt)
-def Place_poles(plant_tf, poles:list, steady_gain=1.0):
-    """Build a Desired TF compatible with Compute_Desired_RST.
-    - poles (can be complex) are passed as a list from the user; all poles must be given including conjugate pairs.
-    - steady_gain: closed-loop steady state gain (scales B_cl = dc_gain * B)
+import numpy as np
+
+def poles_to_denominator(poles, check_stability=True, tol=1e-2):
     """
-    if not all(np.abs(p) < 1.0 for p in poles):
-        raise ValueError(
-            "All desired poles must lie strictly inside the unit circle for a bounded discrete step response."
-        )
-    # Extract plant polynomials (trim leading zeros)
-    A = np.trim_zeros(np.asarray(plant_tf.den_list[0][0]), 'f')
-    B = np.trim_zeros(np.asarray(plant_tf.num_list[0][0]), 'f')
-    dc_gain_target=steady_gain
-    deg_A = len(A) - 1
-    deg_B = len(B) - 1
-    desired_deg = deg_A + deg_B
+    Build a monic denominator polynomial from discrete-time poles.
 
+    Parameters
+    ----------
+    poles : array-like
+        Desired poles in the z-plane.
+    check_stability : bool
+        If True, warn if any pole is outside the unit circle.
+    tol : float
+        Threshold for removing numerical imaginary parts.
 
-    A_cl = np.poly(poles)  # closed-loop denominator polynomial 
-    A_cl = np.real_if_close(A_cl) #cleaning up small imaginary parts 
+    Returns
+    -------
+    den : np.ndarray
+        Denominator coefficients in descending powers of z.
+    """
 
-    ## scaling the closed loop numerator to have the disred steady-state gain
-    sumB = float(np.sum(B))
-    sumAcl = float(np.sum(A_cl))
+    poles = np.asarray(poles, dtype=complex)
 
-    if abs(sumB) < 1e-12:
-        # fallback: avoid division by tiny plant DC gain
-        scale = float(dc_gain_target)
-    else:
-        scale = float(dc_gain_target) * (sumAcl / sumB)
+    if check_stability:
+        unstable = np.abs(poles) >= 1
+        if np.any(unstable):
+            raise ValueError(
+                f"Unstable poles detected: {poles[unstable]}"
+            )
 
-    B_cl = scale * B
+    den = np.poly(poles)
 
-    return ct.tf(B_cl, A_cl, plant_tf.dt)
+    # Remove tiny numerical imaginary parts
+    den = np.real_if_close(den)
+
+    # If still complex, clip tiny imaginary components
+    if np.iscomplexobj(den):
+        if np.max(np.abs(np.imag(den))) < tol:
+            den = np.real(den)
+
+    # Normalize to monic polynomial
+    den = den / den[0]
+
+    return den
