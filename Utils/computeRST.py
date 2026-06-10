@@ -9,7 +9,7 @@ import csv
 import warnings
 
 
-def _trim(p):
+def trim(p):
     """
     Remove leading zeros safely. 
     For example if an array is of form [0,0,1], the higher order zeros are not necessary and will be trimmed out. 
@@ -19,7 +19,7 @@ def _trim(p):
     return np.trim_zeros(p, 'f') if np.any(p) else np.array([0.0])
 
 
-def _conv_matrix(a, n):
+def conv_matrix(a, n):
     """
     Builds convolution matrix so that:
         conv(a, x) = A @ x
@@ -33,7 +33,7 @@ def _conv_matrix(a, n):
     return toeplitz(col, row)[:m + n - 1, :n] # return a toeplitz matrix of m+n-1 rows and n collumns
 
 
-def Compute_Denominator_Matching_RST(A_cl:list, plant_discrete_tf):
+def Compute_Denominator_Matching_RST(A_cl:list, plant_discrete_tf,Integrator=True):
     """
     RST synthesis compatible with:
         v = T*r - R*y
@@ -47,8 +47,8 @@ def Compute_Denominator_Matching_RST(A_cl:list, plant_discrete_tf):
     # ------------------------------------------------------------
     # 1. Extract polynomials
     # ------------------------------------------------------------
-    A = _trim(plant_discrete_tf.den[0][0])
-    B = _trim(plant_discrete_tf.num[0][0])
+    A = trim(plant_discrete_tf.den[0][0])
+    B = trim(plant_discrete_tf.num[0][0])
 
     # Normalize the plant denominator to make the Diophantine equation monic.
     A = A / A[0]
@@ -57,23 +57,29 @@ def Compute_Denominator_Matching_RST(A_cl:list, plant_discrete_tf):
     deg_A = len(A) - 1
     deg_B = len(B) - 1
 
+    INT = np.array([1.0, -1.0])
+
     # ------------------------------------------------------------
     # 2. Choose controller structure orders
     # ------------------------------------------------------------
     deg_S = deg_B
     deg_R = deg_A
-
-    nS = deg_S + 1
+    if Integrator :
+        nS = deg_S
+    else:
+        nS = deg_S+1
     nR = deg_R + 1
 
     # ------------------------------------------------------------
     # 3. Build Diophantine equation:
     #       A S + B R = A_cl
     # ------------------------------------------------------------
+    if Integrator:
+        AS = conv_matrix(np.convolve(A, INT), nS)
+    else:
+        AS = conv_matrix(A, nS)
 
-    AS = _conv_matrix(A, nS)
-    BR = _conv_matrix(B, nR)
-
+    BR = conv_matrix(B, nR)
     M = np.hstack([AS, BR]) # stacking horizontally the AS and BR toeplitz matrices forming the M matrix 
 
     # Desired denominator must fit the R/S structure and remain stable for a bounded step response.
@@ -104,8 +110,13 @@ def Compute_Denominator_Matching_RST(A_cl:list, plant_discrete_tf):
     theta, *_ = np.linalg.lstsq(M, A_cl, rcond=None)
     # via the least squares method, this gives the most exact approximate solution 
 
-    S_coeffs = theta[:nS] # extracting the first coeficients into S
+    S_tilde = theta[:nS] # extracting the first coeficients into S
     R_coeffs = theta[nS:] # and the remaining into R 
+
+    if Integrator:
+        S_coeffs=np.convolve(S_tilde,INT)
+    else:
+        S_coeffs=S_tilde
 
     # Verify denominator matching for sanity
     A_cl_check = np.r_[A_cl, np.zeros(M.shape[0] - len(A_cl))] if len(A_cl) < M.shape[0] else A_cl[: M.shape[0]] # building the checking polynomial with the same rules 
@@ -165,7 +176,7 @@ def Compute_Denominator_Matching_RST(A_cl:list, plant_discrete_tf):
         print("Closed-loop DC gain:", ct.dcgain(H_cl))
 
     return S_tf, R_tf, T_tf
-def Compute_Desired_RST(Desired_TF, plant_discrete_tf):
+def Compute_Desired_RST(Desired_TF, plant_discrete_tf,Integrator=True):
     """
     RST synthesis compatible with:
         v = T*r - R*y
@@ -178,11 +189,11 @@ def Compute_Desired_RST(Desired_TF, plant_discrete_tf):
     # ------------------------------------------------------------
     # 1. Extract polynomials
     # ------------------------------------------------------------
-    A = _trim(plant_discrete_tf.den[0][0])
-    B = _trim(plant_discrete_tf.num[0][0])
+    A = trim(plant_discrete_tf.den[0][0])
+    B = trim(plant_discrete_tf.num[0][0])
 
-    A_cl = _trim(Desired_TF.den[0][0])
-    B_cl = _trim(Desired_TF.num[0][0])
+    A_cl = trim(Desired_TF.den[0][0])
+    B_cl = trim(Desired_TF.num[0][0])
 
     # Normalize the polyomials 
     A = A / A[0]
@@ -193,22 +204,29 @@ def Compute_Desired_RST(Desired_TF, plant_discrete_tf):
     deg_A = len(A) - 1
     deg_B = len(B) - 1
 
+    INT = np.array([1.0, -1.0])
     # ------------------------------------------------------------
     # 2. Choose controller structure orders
     # ------------------------------------------------------------
     deg_S = deg_B
     deg_R = deg_A
 
-    nS = deg_S + 1
+    if Integrator :
+        nS = deg_S
+    else:
+        nS = deg_S+1
     nR = deg_R + 1
 
     # ------------------------------------------------------------
     # 3. Build Diophantine equation:
     #       A S + B R = A_cl
     # ------------------------------------------------------------
-
-    AS = _conv_matrix(A, nS)
-    BR = _conv_matrix(B, nR)
+    if Integrator:
+        AS = conv_matrix(np.convolve(A, INT), nS)
+    else:
+        AS = conv_matrix(A, nS)
+    
+    BR = conv_matrix(B, nR)
 
     M = np.hstack([AS, BR]) # stacking horizontally the AS and BR toeplitz matrices forming the M matrix 
 
@@ -232,8 +250,12 @@ def Compute_Desired_RST(Desired_TF, plant_discrete_tf):
     theta, *_ = np.linalg.lstsq(M, A_cl, rcond=None)
     # via the least squares method, this gives the most exact approximate solution 
 
-    S_coeffs = theta[:nS] # extracting the first coeficients into S
+    S_tilde = theta[:nS] # extracting the first coeficients into S
     R_coeffs = theta[nS:] # and the remaining into R 
+    if Integrator:
+        S_coeffs=np.convolve(S_tilde,INT)
+    else:
+        S_coeffs=S_tilde
 
     # Verify denominator matching for sanity
     A_cl_check = np.r_[A_cl, np.zeros(M.shape[0] - len(A_cl))] if len(A_cl) < M.shape[0] else A_cl[: M.shape[0]] # building the checking polynomial with the same rules 
