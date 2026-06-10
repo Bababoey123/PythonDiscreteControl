@@ -1,0 +1,12 @@
+RST Synthesis and Simulation Cleanup Checklist
+
+1. Fix RST synthesis and notebook validation so discrete closed-loop simulation matches designed closed-loop transfer function.
+2. Resolve notebook cell issues and control timing semantics.
+3. Enable Compute_Denominator_Matching_RST to accept A_cl with a pure integrator (z=1).
+4. Correct the T polynomial calculation and DC gain reporting for marginally stable cases.
+5. Clean up discrete simulator initial conditions.
+6. Verify RSTController history update and standard 1/S filtering structure.
+7. Confirm TFSimulator startup history is initialized consistently with zeros.
+8. Ensure marginally stable designs do not report finite DC gain incorrectly.
+9. Validate hybrid simulation and discrete timing semantics remain consistent.
+10. Refactor notebook experiments to separate denominator-only vs full transfer function synthesis.

@@ -21,15 +21,13 @@ class TFSimulator:
 
         self.u_hist = np.zeros(len(self.num_dis))
 
+        # Initialize past outputs to zero. The current output history is built from
+        # the discrete simulation as it advances, so prior outputs are assumed zero
+        # unless the user supplies a more complete initial condition model.
         if len(self.den_dis) > 1:
-            # Initialize past outputs to your initial state value
-            y0 = float(np.asarray(X_0).reshape(-1)[0])
-            self.y_hist = np.full(len(self.den_dis) - 1, y0)
+            self.y_hist = np.zeros(len(self.den_dis) - 1)
         else:
             self.y_hist = np.array([])
-       
-
-        #self.y_hist[0]=y_0
     def reset(self,X_0):
         """Resets the states of the plant, useful for a new simulation using the same plant 
 
@@ -37,16 +35,11 @@ class TFSimulator:
             X_0 (np.array([[x],[y]])): the initial state of the plant
         """
         self.u_hist = np.zeros(len(self.num_dis))
-        ## for handling cases where the numearator or the denominator equal to 1
         if len(self.den_dis) > 1:
             self.y_hist = np.zeros(len(self.den_dis)-1)
-            y0 = np.asarray(X_0).reshape(-1)[0]
-            self.y_hist[0] = float(y0)
         else:
              self.y_hist = np.array([])
         
-       
-    
         return
     def step(self,u):
         """Calculates the next step y[k](y[k-1],y[k-2],....,u[k],u[k-1],...)
