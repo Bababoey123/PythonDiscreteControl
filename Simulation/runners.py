@@ -1,4 +1,4 @@
-"""The most imporotant part of the library, contains the functions that run differen simulations, knowing the iputs and ouptus of each is mandatory to use the library
+"""The most important part of the library, contains the functions that run different simulations, knowing the inputs and outputs of each is mandatory to use the library
 """
 
 
@@ -94,7 +94,7 @@ def run_discrete_impulse_response(
         u = 1.0/config_file.dt if k == 0 else 0.0
         y = plant_sim.step(u)
 
-        logger.log((k+1) * config_file.dt, y, np.array([u]))
+        logger.log((k+1) * config_file.dt, np.array([y]), np.array([u]))
 
     return logger
 def run_discrete_step_response(
@@ -128,7 +128,7 @@ def run_discrete_step_response(
     
         y = plant_sim.step(u)
        
-        logger.log((k+1) * config_file.dt, y, np.array([u]))
+        logger.log((k+1) * config_file.dt, np.array([y]), np.array([u]))
 
     return logger
 def run_continuous_control_loop(
@@ -196,7 +196,7 @@ def run_continuous_control_loop(
             if t >= HybridSim.config_file.T:
                 break
     return Logger
-def run_continuous_impulse_respone(HybridSim,X_0,Logger:SimLog)->SimLog:
+def run_continuous_impulse_response(HybridSim,X_0,Logger:SimLog)->SimLog:
         """Runs the open-loop continuous impulse response using RK4 integration.
 
         The impulse magnitude is 1/dt_plant so that the discrete pulse approximates
@@ -248,7 +248,7 @@ def run_continuous_step_response(HybridSim,X_0,Logger:SimLog)->SimLog:
             X=HybridSim.rk4_step(X,u)
             ## update time 
             t+=HybridSim.dt_plant
-            Logger.log(t,X[0][0],u)
+            Logger.log(t, np.array([X[0][0]]), np.array([u.item()]))
             if t >= HybridSim.config_file.T:
                  break
                 

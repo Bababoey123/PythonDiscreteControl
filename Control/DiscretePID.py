@@ -29,8 +29,7 @@ class DiscretePID:
         ### classical PID ###
         self.transferFunction=self.As_TransferFunction(text_option)
         self.controller_sim=TFSimulator(self.transferFunction,0)
-        self.PID_TF_cont=ct.tf([kd,kp,ki],[1,0])
-        
+
         ### As RST ###
         self.As_RST()
     
