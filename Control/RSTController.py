@@ -4,13 +4,21 @@ import control as ct
 from Simulation.simulation import TFSimulator
 
 class RSTController:
-    def __init__(self, R:ct.TransferFunction, S:ct.TransferFunction, T:ct.TransferFunction):
-        """Gerenates the transfer function simulators for the R,S and T polynomials
+    """Polynomial RST controller implementing the two-degree-of-freedom control law:
+
+        S(z) · u[k] = T(z) · r[k] - R(z) · y[k]
+
+    The 1/S block is realised as a recursive TFSimulator; T and R are applied
+    as direct FIR dot products on the reference and output histories.
+    """
+    def __init__(self, R: ct.TransferFunction, S: ct.TransferFunction, T: ct.TransferFunction):
+        """Initialises the RST controller from three polynomial transfer functions.
 
         Args:
-            R (ct.TransferFunction): the ct.tf() of the R polynomial
-            S (ct.TransferFunction): the ct.tf() of the S polynomial
-            T (ct.TransferFunction): the ct.ts() of the T polynomial
+            R (ct.TransferFunction): Feedback polynomial — acts on the output history.
+            S (ct.TransferFunction): Denominator polynomial — defines the recursive filter
+                on the control signal. Must be monic and stable.
+            T (ct.TransferFunction): Feedforward polynomial — acts on the reference history.
         """
        ### building the T/S and R/S fractions 
         self.R_coeffs = R.num_list[0][0]
@@ -36,7 +44,18 @@ class RSTController:
         self.reference=r
         return
     def step(self, y):
+        """Computes the control output for the current plant measurement.
 
+        Implements one step of the RST law:
+            v[k] = T·r_hist - R·y_hist
+            u[k] = (1/S) · v[k]
+
+        Args:
+            y (float): Current plant output y[k].
+
+        Returns:
+            float: Control signal u[k].
+        """
         # shift reference history
         self.r_hist[1:] = self.r_hist[:-1]
         self.r_hist[0] = self.reference

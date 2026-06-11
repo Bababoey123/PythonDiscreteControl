@@ -8,7 +8,13 @@ import control as ct
 import csv
 import warnings
 
-def as_csv(csv_title:str,logs):
+def as_csv(csv_title: str, logs):
+    """Exports a SimLog to a CSV file with columns: time, output, input.
+
+    Args:
+        csv_title (str): Output filename without the ``.csv`` extension.
+        logs (SimLog): Populated SimLog instance to export.
+    """
     with open(csv_title+'.csv', 'w', newline='') as csvfile:
         fieldnames = ['time', 'output','input']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
@@ -19,9 +25,24 @@ def as_csv(csv_title:str,logs):
     return
 
 def Place_real_radius(plant_tf, pole_radius=0.85, steady_gain=1.0):
-    """Build a Desired TF compatible with Compute_Desired_RST with real poles at a desired radius.
-    - pole_radius: 0<r<1 place all desired poles at r (slower if r closer to 1)
-    - steady_gain: closed-loop steady-state gain (scales B_cl = dc_gain * B)
+    """Builds a desired closed-loop transfer function with all real poles at a given radius.
+
+    Constructs a TF compatible with ``Compute_Desired_RST``. The denominator degree is
+    deg(A) + deg(B) and all poles are placed at ``pole_radius``. The numerator is scaled
+    to achieve the requested DC gain.
+
+    Args:
+        plant_tf (ct.TransferFunction): Discrete plant transfer function.
+        pole_radius (float, optional): Desired pole radius, strictly in (0, 1).
+            Poles closer to 1 yield a slower response. Defaults to 0.85.
+        steady_gain (float, optional): Desired closed-loop DC gain. Defaults to 1.0.
+
+    Returns:
+        ct.TransferFunction: Desired closed-loop transfer function with the same
+        sampling period as ``plant_tf``.
+
+    Raises:
+        ValueError: If ``pole_radius`` is not strictly between 0 and 1.
     """
     if not (0.0 < pole_radius < 1.0):
         raise ValueError(

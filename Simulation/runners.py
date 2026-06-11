@@ -1,4 +1,4 @@
-"""The most imporotant port of the library, contains the functions that run differen simulations, knowing the iputs and ouptus of each is mandatory to use the library
+"""The most imporotant part of the library, contains the functions that run differen simulations, knowing the iputs and ouptus of each is mandatory to use the library
 """
 
 
@@ -22,20 +22,26 @@ def run_discrete_control(
     r: float,
     y_0: float,
     logger: SimLog,
-    Disturb=True
+    Disturb=True,
+    Saturate=True
 ) -> SimLog:
-    """Computes the discrete closed loop response of the plant and it's controller, returns the logger
+    """Runs the discrete closed-loop simulation and returns the populated logger.
 
     Args:
-        plant_sim (TFSimulator): A TFSimulator instance initalised with the plant's model
-        controller (_type_): a controller object, must include step and reset methods
-        config_file (_type_): configuration file of the plant, contains the simulations lengh and sampling time 
-        r (float): the reference 
-        y_0 (float): ititial state 
-        logger (SimLog): the SimLog() logger for data recording
+        plant_sim (TFSimulator): Simulator initialised with the plant's discrete transfer function.
+        controller: Controller object exposing ``step(y)`` and ``setReference(r)`` methods.
+        config_file: Plant configuration module; must expose ``T`` (total time) and ``dt``
+            (sampling period).
+        r (float): Reference (setpoint) for the controller.
+        y_0 (float): Initial plant output.
+        logger (SimLog): SimLog instance used to record time, output, and input.
+        Disturb (bool, optional): If True, applies a step input disturbance of 2.0
+            after t = 3 s. Defaults to True.
+        Saturate (bool, optional): If True, clips the control signal to [-10, +10].
+            Defaults to True.
 
     Returns:
-        SimLog: The initial logger, now with all the data 
+        SimLog: The logger passed as input, now populated with simulation data.
     """
     
     N = int(config_file.T / config_file.dt)
@@ -45,12 +51,11 @@ def run_discrete_control(
 
     plant_sim.reset(y_0)
     for k in range(N):
-        if Disturb and k*config_file.dt > 3.0:
-                d = np.array([[2.0]])
-        else:
-                d = np.array([[0.0]])
+        d = 2.0 if (Disturb and k * config_file.dt > 3.0) else 0.0
         u = controller.step(y)
-        y = plant_sim.step(u+d)
+        if Saturate:
+            u = float(np.clip(u, -10.0, +10.0))
+        y = plant_sim.step(u + d)
     
         logger.log((k+1) * config_file.dt, np.array([y]), np.array([u]))
         
@@ -62,17 +67,19 @@ def run_discrete_impulse_response(
     y_0: float,
     logger: SimLog
 ) -> SimLog:
-    """Computes the discrete impulse response of the plant, returns the logger 
-     Args:
-        plant_sim (TFSimulator): A TFSimulator instance initalised with the plant's model
-        config_file (_type_): configuration file of the plant, contains the simulations lengh and sampling time 
-        y_0 (float): ititial state 
-        logger (SimLog): the SimLog() logger for data recording
+    """Runs the open-loop discrete impulse response and returns the populated logger.
+
+    The impulse magnitude is 1/dt so that the discrete impulse approximates a
+    continuous Dirac delta with unit area.
+
+    Args:
+        plant_sim (TFSimulator): Simulator initialised with the plant's discrete transfer function.
+        config_file: Plant configuration module; must expose ``T`` and ``dt``.
+        y_0 (float): Initial plant output.
+        logger (SimLog): SimLog instance used to record time, output, and input.
 
     Returns:
-        SimLog: The entry logger, now with all the data 
-
-   
+        SimLog: The logger passed as input, now populated with simulation data.
     """
 
     N = int(config_file.T / config_file.dt)
@@ -96,15 +103,18 @@ def run_discrete_step_response(
     y_0: float,
     logger: SimLog
 ) -> SimLog:
-    """Computes the discrete impulse response on the plant
-     Args:
-        plant_sim (TFSimulator): A TFSimulator instance initalised with the plant's model
-        config_file (_type_): configuration file of the plant, contains the simulations lengh and sampling time 
-        y_0 (float): ititial state 
-        logger (SimLog): the SimLog() logger for data recording
+    """Runs the open-loop discrete step response and returns the populated logger.
+
+    A constant unit input u = 1.0 is applied for the full simulation duration.
+
+    Args:
+        plant_sim (TFSimulator): Simulator initialised with the plant's discrete transfer function.
+        config_file: Plant configuration module; must expose ``T`` and ``dt``.
+        y_0 (float): Initial plant output.
+        logger (SimLog): SimLog instance used to record time, output, and input.
 
     Returns:
-        SimLog: The entry logger, now with all the data 
+        SimLog: The logger passed as input, now populated with simulation data.
     """
 
     N = int(config_file.T / config_file.dt)
@@ -127,20 +137,27 @@ def run_continuous_control_loop(
     r,
     X_0,
     Logger:SimLog,
-    Disturb=True
+    Disturb=True,
+    Saturate=True
     )->SimLog:
-    """Runs the cloed loop hybrid simulation
+    """Runs the closed-loop hybrid simulation (continuous plant, discrete controller).
+
+    The plant is integrated at ``dt_plant`` (1 ms) using RK4; the controller updates
+    every ``config_file.dt`` seconds.
 
     Args:
-        HybridSim (HybridSim): The HybridSim object, initialised withe the plants model
-        controller: The controller object, must have a .transerFunction with his discrete tranfer function
-        r: The reference for the controller
-        X_0: The initial state
-        Logger (SimLog): The empty SimLog() instance of the simulation
-        
+        HybridSim (HybridSim): Hybrid simulator initialised with the plant's state-space model.
+        controller: Controller object exposing ``step(y)`` and ``setReference(r)`` methods.
+        r: Reference (setpoint) for the controller.
+        X_0: Initial state vector of the continuous plant.
+        Logger (SimLog): SimLog instance used to record time, output, and input.
+        Disturb (bool, optional): If True, applies a step input disturbance of 6.0
+            after t = 3 s. Defaults to True.
+        Saturate (bool, optional): If True, clips the control signal to [-10, +10].
+            Defaults to True.
 
     Returns:
-        SimLog: The SimLog instance passed as input, now with the data of the simulation
+        SimLog: The logger passed as input, now populated with simulation data.
     """
     controller.setReference(r)
     
@@ -148,24 +165,22 @@ def run_continuous_control_loop(
     X=np.asarray(X_0,dtype=float)
         
     t = 0.0
-    dt_control = HybridSim.config_file.dt
-    u_k = np.array([[0.0]], dtype=float) #initial control input
-    
+    u_k = np.array([[0.0]], dtype=float)
+
     while t < HybridSim.config_file.T:
-        # 1. Force the output product to extract as a clean scalar float
-        y_matrix = HybridSim.C @ X
-        y_k = float(np.squeeze(y_matrix)) 
-        
-        # 2. Force the controller step output to be a pure float
+        # Sample the plant output at the start of each control period
+        y_k = float(np.squeeze(HybridSim.C @ X))
+
+        # Compute and optionally saturate the control action (ZOH: held for N_substep steps)
         u_scalar = float(controller.step(y_k))
-        #print("u_k-",u_scalar,"y_k-",y_k)
-        # 3. Format the control action array safely for your RK4 block
+        if Saturate:
+            u_scalar = float(np.clip(u_scalar, -10.0, +10.0))
         u_k = np.array([[u_scalar]], dtype=float)
-            
-        # 4. Step the continuous plant states forward
+
+        # Step the continuous plant forward one control period
         for i in range(N_substep):
             if Disturb and t > 3.0:
-                d = np.array([[2.0]])
+                d = np.array([[6.0]])
             else:
                 d = np.array([[0.0]])
 
@@ -182,48 +197,46 @@ def run_continuous_control_loop(
                 break
     return Logger
 def run_continuous_impulse_respone(HybridSim,X_0,Logger:SimLog)->SimLog:
-        """Runs the impulse response of the open loop plant
+        """Runs the open-loop continuous impulse response using RK4 integration.
+
+        The impulse magnitude is 1/dt_plant so that the discrete pulse approximates
+        a continuous Dirac delta with unit area, consistent with run_discrete_impulse_response.
 
         Args:
-            HybridSim (HybridSim): An HybridSim instance initalised with the plants space state model
-            X_0 (_type_): Initial state
-            Logger (SimLog): an instance of the SimLog class, preferably new or empty 
+            HybridSim (HybridSim): Hybrid simulator initialised with the plant's state-space model.
+            X_0: Initial state vector of the continuous plant.
+            Logger (SimLog): SimLog instance used to record time, output, and input.
 
         Returns:
-            SimLog: the logger containing the results of the simulation 
+            SimLog: The logger passed as input, now populated with simulation data.
         """
-        X=np.asarray(X_0,dtype=float)
-        
+        X = np.asarray(X_0, dtype=float)
         t = 0.0
-        u = np.array([[0.0]], dtype=float) #initial control input
-    
-        while t<HybridSim.config_file.T:
-            ## impulse u
-            if t==0: u =np.array([[1.0]], dtype=float)
-            else: u=np.array([[0.0]], dtype=float)
-            ##
-            x_dot=HybridSim.A @ X + HybridSim.B @ u
-            ## simple forward euler 
-            X+= HybridSim.dt_plant*x_dot
-            y=HybridSim.C @ X
-            ## update time 
-            t+=HybridSim.dt_plant
-            Logger.log(t,y,u)
+        k = 0
+
+        while t < HybridSim.config_file.T:
+            u = np.array([[1.0 / HybridSim.dt_plant]], dtype=float) if k == 0 else np.array([[0.0]], dtype=float)
+            X = HybridSim.rk4_step(X, u)
+            t += HybridSim.dt_plant
+            k += 1
+            Logger.log(t, HybridSim.C @ X, u)
             if t >= HybridSim.config_file.T:
-                 break
-                
+                break
+
         return Logger
 def run_continuous_step_response(HybridSim,X_0,Logger:SimLog)->SimLog:
-        """Runs the step response of the open loop plant
+        """Runs the open-loop continuous step response using RK4 integration.
+
+        A constant unit input u = 1.0 is applied for the full simulation duration.
 
         Args:
-            HybridSim (HybridSim): An HybridSim instance initalised with the plants space state model
-            X_0 (_type_): Initial state
-            Logger (SimLog): an instance of the SimLog class, preferably new or empty 
+            HybridSim (HybridSim): Hybrid simulator initialised with the plant's state-space model.
+            X_0: Initial state vector of the continuous plant.
+            Logger (SimLog): SimLog instance used to record time, output, and input.
 
         Returns:
-            SimLog: the logger containing the results of the simulation 
-        """ 
+            SimLog: The logger passed as input, now populated with simulation data.
+        """
         
         X=np.asarray(X_0,dtype=float)
         
