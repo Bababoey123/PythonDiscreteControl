@@ -45,6 +45,7 @@ def run_discrete_control(
     """
     
     N = int(config_file.T / config_file.dt)
+    controller.reset()
     controller.setReference(r)
     u = 0.0
     y = y_0
@@ -132,7 +133,7 @@ def run_discrete_step_response(
 
     return logger
 def run_continuous_control_loop(
-    HybridSim:HybridSim,
+    Simulator,
     controller,
     r,
     X_0,
@@ -159,17 +160,18 @@ def run_continuous_control_loop(
     Returns:
         SimLog: The logger passed as input, now populated with simulation data.
     """
+    controller.reset()
     controller.setReference(r)
-    
-    N_substep=int(HybridSim.config_file.dt/HybridSim.dt_plant) ## number of substeps between each controller update
+
+    N_substep=int(Simulator.config_file.dt/Simulator.dt_plant) ## number of substeps between each controller update
     X=np.asarray(X_0,dtype=float)
         
     t = 0.0
     u_k = np.array([[0.0]], dtype=float)
 
-    while t < HybridSim.config_file.T:
+    while t < Simulator.config_file.T:
         # Sample the plant output at the start of each control period
-        y_k = float(np.squeeze(HybridSim.C @ X))
+        y_k = float(np.squeeze(Simulator.C @ X))
 
         # Compute and optionally saturate the control action (ZOH: held for N_substep steps)
         u_scalar = float(controller.step(y_k))
@@ -178,22 +180,22 @@ def run_continuous_control_loop(
         u_k = np.array([[u_scalar]], dtype=float)
 
         # Step the continuous plant forward one control period
-        for i in range(N_substep):
+        for _ in range(N_substep):
             if Disturb and t > 3.0:
-                d = np.array([[6.0]])
+                d = np.array([[2.0]])
             else:
                 d = np.array([[0.0]])
 
             u_plant = u_k + d
-            X = HybridSim.rk4_step(X, u_plant)
+            X = Simulator.rk4_step(X, u_plant)
             
             # Update physical loop clock
-            t += HybridSim.dt_plant
+            t += Simulator.dt_plant
             
             # Log as pure NumPy primitives to prevent array accumulation 
             Logger.log(t, np.array([X[0][0]]), np.array([u_scalar]))
             
-            if t >= HybridSim.config_file.T:
+            if t >= Simulator.config_file.T:
                 break
     return Logger
 def run_continuous_impulse_response(HybridSim,X_0,Logger:SimLog)->SimLog:

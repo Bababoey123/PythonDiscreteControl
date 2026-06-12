@@ -2,6 +2,7 @@ import numpy as np
 import control as ct
 
 from Models.BallBeam.StateSpace import LinearStateSpaceModel
+from Models.BallBeam.NonlinearDynamics import NonlinearBallBeamModel
 from Metrics_Plotting.SimLog import SimLog
 
 
@@ -123,4 +124,18 @@ class HybridSim:
         k4=function(X+self.dt_plant*k3)
         
         return X +self.dt_plant/6*(k1+2*k2+2*k3+k4)
+class NonLinearHybridSim:
+    def __init__(self, model: NonlinearBallBeamModel, config_file):
+        self.dynamics = model.f
+        self.C = np.array([[1, 0]])   # C matrix 
+        self.dt_plant = 1e-3          # for RK4
+        self.config_file = config_file
         
+    def rk4_step(self, X, u_k) -> np.ndarray:
+        u = float(np.squeeze(u_k))
+        f = self.dynamics
+        k1 = f(X, u)
+        k2 = f(X + self.dt_plant * 0.5 * k1, u)
+        k3 = f(X + 0.5 * self.dt_plant * k2, u)
+        k4 = f(X + self.dt_plant * k3, u)
+        return X + self.dt_plant / 6 * (k1 + 2*k2 + 2*k3 + k4)

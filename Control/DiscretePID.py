@@ -34,6 +34,9 @@ class DiscretePID:
         self.As_RST()
     
         return
+    def reset(self):
+        self.controller_sim.reset(0)
+
     def setReference(self,r):
         """Sets the reference of the PID controller
 

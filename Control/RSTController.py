@@ -35,6 +35,11 @@ class RSTController:
         self.S_block_sim = TFSimulator(one_over_S, 0)
 
         self.reference = 0.0
+    def reset(self):
+        self.r_hist[:] = 0.0
+        self.y_hist[:] = 0.0
+        self.S_block_sim.reset(0)
+
     def setReference(self,r):
         """Sets the reference of the RST controller
 
