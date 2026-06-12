@@ -10,3 +10,8 @@ RST Synthesis and Simulation Cleanup Checklist
 8. Ensure marginally stable designs do not report finite DC gain incorrectly.
 9. Validate hybrid simulation and discrete timing semantics remain consistent.
 10. Refactor notebook experiments to separate denominator-only vs full transfer function synthesis.
+
+
+python -m pdoc --output-dir docs/pdoc --template-directory docs/pdoc_templates \
+  Control Models.BallBeam.* Simulation.simulation Simulation.runners \
+  Metrics_Plotting.* Utils.utils Utils.computeRST

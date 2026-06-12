@@ -1,0 +1,132 @@
+{#
+    Custom index template — shows the project __init__.py docstring as the main page
+    instead of a bare module list or an automatic redirect.
+#}
+{% extends "default/frame.html.jinja2" %}
+
+{% block title %}PythonDiscreteControl – API Documentation{% endblock %}
+
+{% block style %}
+    {{ super() | safe }}
+    <style>
+        header.pdoc {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        header.pdoc input[type=search] {
+            outline-offset: 0;
+            font-size: 1.5rem;
+            min-width: 60%;
+            flex-grow: 1;
+            padding-left: .5rem;
+            margin: 1.75rem 0;
+        }
+    </style>
+{% endblock %}
+
+{% block nav %}
+    <h2>Modules</h2>
+    <ul>
+        {% for submodule in all_modules if "._" not in submodule and not submodule.startswith("_") %}
+            <li><a href="{{ submodule.replace(".", "/") }}.html">{{ submodule }}</a></li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+
+{% block content %}
+    <header class="pdoc">
+        {% if search %}
+            <input type="search" placeholder="Search API Documentation…" aria-label="search box">
+        {% endif %}
+    </header>
+
+    <main class="pdoc">
+        <article class="pdoc">
+
+            <h1>Hybrid Control and Simulation Library for Discrete–Continuous Systems</h1>
+
+            <p>This library provides a unified framework for simulating control systems that combine
+            discrete-time controllers with continuous-time or discretised plant models.</p>
+
+            <p>The main goal is to support consistent comparison between:</p>
+            <ul>
+                <li>Pure discrete-time transfer function simulations (z-domain models)</li>
+                <li>Continuous-time state-space simulations with numerical integration</li>
+                <li>Hybrid closed-loop systems where a discrete controller interacts with a continuous plant</li>
+            </ul>
+
+            <h2>Core Features</h2>
+            <ol>
+                <li>
+                    <strong>Discrete-time signal simulation</strong>
+                    <ul>
+                        <li>Finite-difference implementation of transfer functions</li>
+                        <li>Used for controllers (PID, RST) and discrete plant models</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Continuous-time plant simulation</strong>
+                    <ul>
+                        <li>State-space representation (A, B, C matrices)</li>
+                        <li>Numerical integration via RK4</li>
+                        <li>Used for high-fidelity plant dynamics</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Hybrid simulation environment</strong>
+                    <ul>
+                        <li>Discrete controller evaluated at a fixed sampling period</li>
+                        <li>Continuous plant updated at a finer integration timestep</li>
+                        <li>Emulates real digital control hardware interacting with a physical system</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Control architectures</strong>
+                    <ul>
+                        <li>PID controllers implemented as discrete transfer functions</li>
+                        <li>RST controllers using polynomial representations (R, S, T)</li>
+                        <li>Unified interface for future extensions (LQR, MPC, …)</li>
+                    </ul>
+                </li>
+            </ol>
+
+            <h2>Architecture Overview</h2>
+            <p>The library is structured around five abstraction layers:</p>
+            <ul>
+                <li><strong>Simulation</strong> — numerical evolution of systems:
+                    <code>TFSimulator</code>, <code>HybridSim</code>, <code>NonLinearHybridSim</code>;
+                    high-level runner functions in <code>runners.py</code>.</li>
+                <li><strong>Control</strong> — discrete controllers:
+                    <code>DiscretePID</code>, <code>RSTController</code>.</li>
+                <li><strong>Models</strong> — physical parameters and plant representations:
+                    <code>ballbeam_config</code>, <code>LinearStateSpaceModel</code>,
+                    <code>TransferFunctionModel</code>, <code>NonlinearBallBeamModel</code>.</li>
+                <li><strong>Metrics_Plotting</strong> — logging, plotting, and performance metrics:
+                    <code>SimLog</code>, <code>Plotting</code>, <code>Metrics</code>.</li>
+                <li><strong>Utils</strong> — helper functions:
+                    CSV export (<code>as_csv</code>), RST synthesis
+                    (<code>Compute_Desired_RST</code>, <code>Compute_Denominator_Matching_RST</code>),
+                    pole placement utilities.</li>
+            </ul>
+
+            <h2>Design Philosophy</h2>
+            <p>The library is designed to ensure consistency between:</p>
+            <ul>
+                <li>Analytical control design (transfer functions, z-domain algebra)</li>
+                <li>Numerical simulation (difference equations and integration methods)</li>
+                <li>Hybrid digital implementations (realistic sampled-data control loops)</li>
+            </ul>
+            <p>A key objective is to make discrepancies between theoretical models, numerical
+            simulation, and hybrid execution <em>explicit and measurable</em> rather than hidden.
+            This enables systematic validation of discretisation effects, sampling-time influence,
+            numerical integration errors, and controller implementation consistency.</p>
+
+        </article>
+    </main>
+
+    {% if search %}
+        {% include "search.html.jinja2" %}
+    {% endif %}
+{% endblock %}

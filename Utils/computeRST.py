@@ -1,11 +1,6 @@
-from Metrics_Plotting import SimLog
-
 import numpy as np
-import scipy.linalg as la
 from scipy.linalg import toeplitz
-from sklearn.preprocessing import scale
 import control as ct
-import csv
 import warnings
 
 
