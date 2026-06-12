@@ -1,7 +1,7 @@
 # PythonDiscreteControl
 
 A lightweight Python library for simulating, designing, and validating discrete and hybrid control systems. The library makes the gap between theoretical discrete models and physical sampled-data systems explicit and measurable.
-
+Full documentation can be accessed [here](https://bababoey123.github.io/PythonDiscreteControl/)
 ---
 
 ## Table of Contents
