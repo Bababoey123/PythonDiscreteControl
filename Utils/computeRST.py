@@ -10,42 +10,95 @@ import warnings
 
 
 def trim(p):
-    """
-    Remove leading zeros safely. 
-    For example if an array is of form [0,0,1], the higher order zeros are not necessary and will be trimmed out. 
-    If the array is filled with zeros it will output [0.0]
+    """Removes leading zeros from a polynomial coefficient array.
+
+    Leading zeros represent unnecessary high-order terms (e.g. [0, 0, 1] is just [1]).
+    If the entire array is zero the function returns [0.0] rather than an empty array,
+    so that downstream polynomial operations always receive a valid input.
+
+    Args:
+        p (array-like): Polynomial coefficients in descending order of power.
+
+    Returns:
+        np.ndarray: Trimmed coefficient array with no leading zeros (minimum length 1).
     """
     p = np.array(p, dtype=float)
     return np.trim_zeros(p, 'f') if np.any(p) else np.array([0.0])
 
 
 def conv_matrix(a, n):
-    """
-    Builds convolution matrix so that:
-        conv(a, x) = A @ x
-    """
-    a = np.asarray(a, dtype=float) ## build a numpy array from the list a 
-    m = len(a)
+    """Builds the convolution (Toeplitz) matrix for polynomial multiplication.
 
-    col = np.r_[a, np.zeros(n - 1)] #concacatantes an array of [n-1] zeros to a forming a coluums vector 
-    row = np.r_[a[0], np.zeros(n - 1)] #same thing but with a row 
+    Returns a matrix A such that  A @ x == np.convolve(a, x)  for any length-n
+    vector x.  This lets the Diophantine equation A·S + B·R = A_cl be written as
+    a linear system M·θ = A_cl and solved with least squares.
 
-    return toeplitz(col, row)[:m + n - 1, :n] # return a toeplitz matrix of m+n-1 rows and n collumns
+    The returned matrix has shape (len(a) + n − 1, n).
 
-
-def Compute_Denominator_Matching_RST(A_cl:list, plant_discrete_tf,Integrator=True, A0=None):
-    """
-    RST synthesis compatible with:
-        v = T*r - R*y
-        u = (1/S) v
-
-    A0 is an optional observer polynomial whose roots become additional closed-loop poles.
-    The total desired closed-loop characteristic polynomial is A_cl * A0.
-    The Diophantine equation solved is:
-        A * S + B * R = A_cl * A0
+    Args:
+        a (array-like): Polynomial coefficient array (the fixed polynomial).
+        n (int): Length of the unknown polynomial x (number of columns).
 
     Returns:
-        S_tf, R_tf, T_tf -- discrete transfer functions for the S, R, and T polynomials.
+        np.ndarray: Toeplitz convolution matrix of shape (len(a) + n − 1, n).
+    """
+    a = np.asarray(a, dtype=float)
+    m = len(a)
+
+    col = np.r_[a, np.zeros(n - 1)]
+    row = np.r_[a[0], np.zeros(n - 1)]
+
+    return toeplitz(col, row)[:m + n - 1, :n]
+
+
+def Compute_Denominator_Matching_RST(A_cl: list, plant_discrete_tf, Integrator=True, A0=None):
+    """RST synthesis by denominator (characteristic polynomial) matching.
+
+    Computes the S, R, T polynomials such that the closed-loop characteristic polynomial
+    of the RST-controlled plant equals ``A_cl * A0``.  The control law is:
+        v[k] = T·r[k] − R·y[k]
+        u[k] = (1/S) · v[k]
+
+    The denominator of the desired closed-loop transfer function is specified directly as
+    a coefficient list ``A_cl``.  Only the pole locations are prescribed; the numerator
+    (and therefore the DC gain) is determined by computing T from the unity-DC-gain
+    condition  T(1) = A_cl(1) / B(1).
+
+    Use ``Compute_Desired_RST`` instead if you also want to prescribe the closed-loop
+    numerator (and hence the exact transient shape).
+
+    Hardcoded values
+    ----------------
+    INT = [1, −1]
+        When ``Integrator=True`` the plant denominator is augmented by (z−1) to
+        enforce an integrator in the loop, guaranteeing zero steady-state error for
+        step references.
+    Least-squares solve (``np.linalg.lstsq``)
+        The Diophantine system may be slightly over- or under-determined depending on
+        polynomial degrees.  Least squares finds the minimum-norm solution in both cases.
+
+    Args:
+        A_cl (list): Coefficients of the desired dominant closed-loop characteristic
+            polynomial in descending powers of z (need not be monic; it is normalised
+            internally).
+        plant_discrete_tf (ct.TransferFunction): Discrete plant transfer function B(z)/A(z).
+        Integrator (bool, optional): If True, forces S to contain the factor (z−1) to
+            guarantee zero steady-state error for step references.  Defaults to True.
+        A0 (array-like or None, optional): Observer polynomial whose roots are additional
+            (faster) closed-loop poles.  The total desired characteristic polynomial becomes
+            ``A_cl * A0``.  Pass None for no observer poles.  Defaults to None.
+
+    Returns:
+        tuple:
+            S_tf (ct.TransferFunction): S polynomial as a discrete TF with denominator 1.
+            R_tf (ct.TransferFunction): R polynomial as a discrete TF with denominator 1.
+            T_tf (ct.TransferFunction): T polynomial as a discrete TF with denominator 1.
+            H_cl (ct.TransferFunction): Closed-loop transfer function B·T / (A·S + B·R)
+                computed for verification.
+
+    Raises:
+        ValueError: If ``A_cl`` degree exceeds the controller structure capacity, or if
+            ``A_cl * A0`` contains unstable poles.
     """
     # ------------------------------------------------------------
     # 1. Extract polynomials
@@ -214,19 +267,54 @@ def Compute_Denominator_Matching_RST(A_cl:list, plant_discrete_tf,Integrator=Tru
     print("z poles:", np.roots(H_cl.den_list[0][0]))
     print("radius:", np.abs(np.roots(H_cl.den_list[0][0])))
     return S_tf, R_tf, T_tf,H_cl
-def Compute_Desired_RST(Desired_TF, plant_discrete_tf,Integrator=True, A0=None):
-    """
-    RST synthesis compatible with:
-        v = T*r - R*y
-        u = (1/S) v
+def Compute_Desired_RST(Desired_TF, plant_discrete_tf, Integrator=True, A0=None):
+    """RST synthesis from a fully specified desired closed-loop transfer function.
 
-    A0 is an optional observer polynomial whose roots become additional closed-loop poles.
-    The total desired closed-loop characteristic polynomial is Desired_TF.den * A0.
-    The Diophantine equation solved is:
-        A * S + B * R = A_cl * A0
+    Computes S, R, T such that the closed-loop transfer function of the RST-controlled
+    plant equals ``Desired_TF`` (both numerator and denominator matched).  The control
+    law is:
+        v[k] = T·r[k] − R·y[k]
+        u[k] = (1/S) · v[k]
+
+    The desired numerator B_cl must be exactly divisible by the plant numerator B; if not,
+    a ``ValueError`` is raised.  This is automatically satisfied when ``Desired_TF`` is
+    constructed by ``Place_real_radius`` (which builds B_cl as a scalar multiple of B).
+
+    Use ``Compute_Denominator_Matching_RST`` instead if you only want to prescribe the
+    closed-loop poles without specifying the numerator.
+
+    Hardcoded values
+    ----------------
+    INT = [1, −1]
+        Same integrator augmentation as ``Compute_Denominator_Matching_RST``.
+    Exact polynomial division (``np.polydiv``)
+        T is recovered from  B·T = B_cl  via exact polynomial long division.  A non-zero
+        remainder means the desired numerator is not achievable with the given plant model.
+    Tolerance 1e-8
+        Residuals below this threshold in the Diophantine check and in the polynomial
+        division remainder are treated as numerical noise.
+
+    Args:
+        Desired_TF (ct.TransferFunction): Fully specified desired closed-loop discrete
+            transfer function B_cl(z) / A_cl(z).  Typically produced by ``Place_real_radius``.
+        plant_discrete_tf (ct.TransferFunction): Discrete plant transfer function B(z)/A(z).
+        Integrator (bool, optional): If True, forces S to contain the factor (z−1) to
+            guarantee zero steady-state error for step references.  Defaults to True.
+        A0 (array-like or None, optional): Observer polynomial; its roots are additional
+            closed-loop poles appended to the denominator of ``Desired_TF``.
+            Pass None for no observer poles.  Defaults to None.
 
     Returns:
-        S_tf, R_tf, T_tf -- discrete transfer functions for the S, R, and T polynomials.
+        tuple:
+            S_tf (ct.TransferFunction): S polynomial as a discrete TF with denominator 1.
+            R_tf (ct.TransferFunction): R polynomial as a discrete TF with denominator 1.
+            T_tf (ct.TransferFunction): T polynomial as a discrete TF with denominator 1.
+            H_cl (ct.TransferFunction): Closed-loop transfer function B·T / (A·S + B·R)
+                computed for verification.
+
+    Raises:
+        ValueError: If the Diophantine equation cannot be satisfied, if ``A_cl * A0``
+            contains unstable poles, or if ``B_cl`` is not exactly divisible by ``B``.
     """
 
     # ------------------------------------------------------------
