@@ -49,28 +49,35 @@ def conv_matrix(a, n):
 def Compute_Denominator_Matching_RST(A_cl: list, plant_discrete_tf, Integrator=True, A0=None):
     """RST synthesis by denominator (characteristic polynomial) matching.
 
-    Computes S, R, T by solving the Diophantine equation directly against the full
-    target A_cl_total = A_m * A0, then setting T = t0 * A0.  The algorithm:
+    Computes S, R, T by solving the Diophantine equation and setting T = t0 · A0.
+    The A0 factor in T cancels with the A0 factor in the closed-loop denominator:
 
-      1. Build the full target polynomial A_cl_total = A_m * A0.
-      2. Solve the Diophantine:
-             A_eff(z) · S_tilde(z) + B(z) · R(z) = A_cl_total(z)
-         where A_eff = A*(z-1) when Integrator=True, S = (z-1)*S_tilde.
-      3. Set T = t0 · A0, where t0 = A_m(1)/B(1) enforces unity DC gain.
-
-    The A0 factor in T cancels with the A0 factor in the denominator:
         H_ry = B·T / (A·S + B·R) = B·(t0·A0) / (A_m·A0) = t0·B / A_m
+
     so the reference-to-output dynamics are governed by A_m alone.
 
-    Solving against the full target (not A_m alone) is critical: a "reduced" solve
-    targeting A_m forces a leading-zero constraint on S_tilde that flips its sign,
-    causing the 1/S filter in the RSTController to drive the plant in the wrong
-    direction and the closed-loop simulation to diverge.
+    Algorithm
+    ---------
+    1. Build the target polynomial ``A_cl_total = A_m * A0``.
+    2. **Dead-beat fill** (if needed): if ``A_cl_total`` is shorter than the
+       Diophantine system capacity, trailing zeros are appended (= poles at z=0).
+       This avoids a forced leading-zero in the right-hand side that would flip the
+       sign of S and cause the closed-loop simulation to diverge.  A ``UserWarning``
+       is issued; pass an explicit ``A0`` to control pole placement.
+    3. **Direct solve** (when ``A_cl_total`` fits the system): solve
+       ``A_eff · S_tilde + B · R = A_cl_total`` directly.  With no leading zeros
+       the sign of S_tilde[0] is positive, as required by the 1/S filter.
+    4. **Two-step Landau fallback** (when ``A_cl_total`` exceeds the system): solve
+       the reduced equation against ``A_m``, then set ``S = A0 · S'``,
+       ``R = A0 · R'``.
+    5. Set ``T = t0 · A0``, where ``t0 = A_m(1) / B(1)`` enforces unity DC gain.
 
     Degree constraint
     -----------------
-    The total polynomial A_m * A0 must fit in the Diophantine system:
-        deg(A_m) + deg(A0) ≤ deg(A) + deg(B)
+    ``deg(A_m)`` alone must not exceed the system capacity
+    ``deg(A) + deg(B)`` (``deg(A_eff) + deg(B) - 1`` with Integrator).
+    ``deg(A0)`` is unrestricted: when ``A_m · A0`` overflows, the two-step
+    Landau fallback handles it automatically.
 
     Args:
         A_cl (list): Coefficients of the *dominant* closed-loop characteristic
@@ -79,10 +86,12 @@ def Compute_Denominator_Matching_RST(A_cl: list, plant_discrete_tf, Integrator=T
             the transient response.
         plant_discrete_tf (ct.TransferFunction): Discrete plant transfer function B(z)/A(z).
         Integrator (bool, optional): If True, forces S to contain (z-1) to guarantee
-            zero steady-state error for step references.  Defaults to True.
+            zero steady-state error for step references and exact rejection of constant
+            disturbances (S(1) = 0).  Defaults to True.
         A0 (array-like or None, optional): Observer polynomial.  Its roots are additional
-            closed-loop poles placed faster than A_m; they cancel from the reference path.
-            Pass None for no observer poles (equivalent to A0=1).  Defaults to None.
+            closed-loop poles placed faster than A_m; they cancel from the reference path
+            via T = t0·A0.  Pass None to let the function choose poles automatically
+            (a UserWarning is issued when dead-beat fill is applied).  Defaults to None.
 
     Returns:
         tuple:

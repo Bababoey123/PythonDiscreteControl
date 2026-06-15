@@ -77,17 +77,17 @@
     <main class="pdoc">
             <section class="module-info">
                     <h1 class="modulename">
-Models<wbr>.<a href="./../BallBeam.html">BallBeam</a><wbr>.StateSpace    </h1>
+<a href="./../../Models.html">Models</a><wbr>.<a href="./../BallBeam.html">BallBeam</a><wbr>.StateSpace    </h1>
 
                 
                         <input id="mod-StateSpace-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 
                         <label class="view-source-button" for="mod-StateSpace-view-source"><span>View Source</span></label>
 
-                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-</span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="kn">import</span> <span class="nn">control</span> <span class="k">as</span> <span class="nn">ct</span>
+                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+</span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">control</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ct</span>
 </span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a>
-</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="k">class</span> <span class="nc">LinearStateSpaceModel</span><span class="p">:</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="k">class</span><span class="w"> </span><span class="nc">LinearStateSpaceModel</span><span class="p">:</span>
 </span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Linearised continuous and discrete state-space model of the ball-and-beam plant.</span>
 </span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a>
 </span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="sd">    The continuous model is a double integrator:</span>
@@ -97,7 +97,7 @@ Models<wbr>.<a href="./../BallBeam.html">BallBeam</a><wbr>.StateSpace    </h1>
 </span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="sd">    Both continuous (A, B, C, D) and ZOH-discretised (Ad, Bd, Cd, Dd) matrices</span>
 </span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="sd">    are computed at construction time.</span>
 </span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_file</span><span class="p">):</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_file</span><span class="p">):</span>
 </span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Builds the state-space matrices and discretises with ZOH at the config sampling rate.</span>
 </span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>
 </span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a><span class="sd">        Args:</span>
@@ -135,7 +135,7 @@ Models<wbr>.<a href="./../BallBeam.html">BallBeam</a><wbr>.StateSpace    </h1>
 
     </div>
     <a class="headerlink" href="#LinearStateSpaceModel"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="LinearStateSpaceModel-5"><a href="#LinearStateSpaceModel-5"><span class="linenos"> 5</span></a><span class="k">class</span> <span class="nc">LinearStateSpaceModel</span><span class="p">:</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="LinearStateSpaceModel-5"><a href="#LinearStateSpaceModel-5"><span class="linenos"> 5</span></a><span class="k">class</span><span class="w"> </span><span class="nc">LinearStateSpaceModel</span><span class="p">:</span>
 </span><span id="LinearStateSpaceModel-6"><a href="#LinearStateSpaceModel-6"><span class="linenos"> 6</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Linearised continuous and discrete state-space model of the ball-and-beam plant.</span>
 </span><span id="LinearStateSpaceModel-7"><a href="#LinearStateSpaceModel-7"><span class="linenos"> 7</span></a>
 </span><span id="LinearStateSpaceModel-8"><a href="#LinearStateSpaceModel-8"><span class="linenos"> 8</span></a><span class="sd">    The continuous model is a double integrator:</span>
@@ -145,7 +145,7 @@ Models<wbr>.<a href="./../BallBeam.html">BallBeam</a><wbr>.StateSpace    </h1>
 </span><span id="LinearStateSpaceModel-12"><a href="#LinearStateSpaceModel-12"><span class="linenos">12</span></a><span class="sd">    Both continuous (A, B, C, D) and ZOH-discretised (Ad, Bd, Cd, Dd) matrices</span>
 </span><span id="LinearStateSpaceModel-13"><a href="#LinearStateSpaceModel-13"><span class="linenos">13</span></a><span class="sd">    are computed at construction time.</span>
 </span><span id="LinearStateSpaceModel-14"><a href="#LinearStateSpaceModel-14"><span class="linenos">14</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="LinearStateSpaceModel-15"><a href="#LinearStateSpaceModel-15"><span class="linenos">15</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_file</span><span class="p">):</span>
+</span><span id="LinearStateSpaceModel-15"><a href="#LinearStateSpaceModel-15"><span class="linenos">15</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_file</span><span class="p">):</span>
 </span><span id="LinearStateSpaceModel-16"><a href="#LinearStateSpaceModel-16"><span class="linenos">16</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Builds the state-space matrices and discretises with ZOH at the config sampling rate.</span>
 </span><span id="LinearStateSpaceModel-17"><a href="#LinearStateSpaceModel-17"><span class="linenos">17</span></a>
 </span><span id="LinearStateSpaceModel-18"><a href="#LinearStateSpaceModel-18"><span class="linenos">18</span></a><span class="sd">        Args:</span>
@@ -189,7 +189,7 @@ are computed at construction time.</p>
 
     </div>
     <a class="headerlink" href="#LinearStateSpaceModel.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="LinearStateSpaceModel.__init__-15"><a href="#LinearStateSpaceModel.__init__-15"><span class="linenos">15</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_file</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="LinearStateSpaceModel.__init__-15"><a href="#LinearStateSpaceModel.__init__-15"><span class="linenos">15</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_file</span><span class="p">):</span>
 </span><span id="LinearStateSpaceModel.__init__-16"><a href="#LinearStateSpaceModel.__init__-16"><span class="linenos">16</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Builds the state-space matrices and discretises with ZOH at the config sampling rate.</span>
 </span><span id="LinearStateSpaceModel.__init__-17"><a href="#LinearStateSpaceModel.__init__-17"><span class="linenos">17</span></a>
 </span><span id="LinearStateSpaceModel.__init__-18"><a href="#LinearStateSpaceModel.__init__-18"><span class="linenos">18</span></a><span class="sd">        Args:</span>

@@ -62,13 +62,13 @@ Utils<wbr>.utils    </h1>
 
                         <label class="view-source-button" for="mod-utils-view-source"><span>View Source</span></label>
 
-                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="kn">from</span> <span class="nn">Metrics_Plotting</span> <span class="kn">import</span> <span class="n">SimLog</span>
+                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">Metrics_Plotting</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimLog</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos">  2</span></a>
-</span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-</span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="kn">import</span> <span class="nn">control</span> <span class="k">as</span> <span class="nn">ct</span>
-</span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="kn">import</span> <span class="nn">csv</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">control</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ct</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">csv</span>
 </span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a>
-</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="k">def</span> <span class="nf">as_csv</span><span class="p">(</span><span class="n">csv_title</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">logs</span><span class="p">):</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="k">def</span><span class="w"> </span><span class="nf">as_csv</span><span class="p">(</span><span class="n">csv_title</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">logs</span><span class="p">):</span>
 </span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Exports a SimLog to a CSV file with columns: time, output, input.</span>
 </span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a>
 </span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a><span class="sd">    Args:</span>
@@ -84,7 +84,7 @@ Utils<wbr>.utils    </h1>
 </span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a>            <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">({</span><span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="n">logs</span><span class="o">.</span><span class="n">t_hist</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">,</span><span class="s1">&#39;output&#39;</span><span class="p">:</span> <span class="n">logs</span><span class="o">.</span><span class="n">y_hist</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="s1">&#39;input&#39;</span><span class="p">:</span><span class="n">logs</span><span class="o">.</span><span class="n">u_hist</span><span class="p">[</span><span class="n">i</span><span class="p">]})</span>
 </span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a>    <span class="k">return</span>
 </span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a>
-</span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a><span class="k">def</span> <span class="nf">Place_real_radius</span><span class="p">(</span><span class="n">plant_tf</span><span class="p">,</span> <span class="n">pole_radius</span><span class="o">=</span><span class="mf">0.85</span><span class="p">,</span> <span class="n">steady_gain</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+</span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a><span class="k">def</span><span class="w"> </span><span class="nf">Place_real_radius</span><span class="p">(</span><span class="n">plant_tf</span><span class="p">,</span> <span class="n">pole_radius</span><span class="o">=</span><span class="mf">0.85</span><span class="p">,</span> <span class="n">steady_gain</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
 </span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Builds a desired closed-loop transfer function with all real poles at a given radius.</span>
 </span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a>
 </span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a><span class="sd">    Constructs a TF compatible with ``Compute_Desired_RST``. The denominator degree is</span>
@@ -132,9 +132,9 @@ Utils<wbr>.utils    </h1>
 </span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a>    <span class="n">B_cl</span> <span class="o">=</span> <span class="n">scale</span> <span class="o">*</span> <span class="n">B</span>
 </span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a>
 </span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a>    <span class="k">return</span> <span class="n">ct</span><span class="o">.</span><span class="n">tf</span><span class="p">(</span><span class="n">B_cl</span><span class="p">,</span> <span class="n">A_cl</span><span class="p">,</span> <span class="n">plant_tf</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
-</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 </span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>
-</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a><span class="k">def</span> <span class="nf">poles_to_denominator</span><span class="p">(</span><span class="n">poles</span><span class="p">,</span> <span class="n">check_stability</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">):</span>
+</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a><span class="k">def</span><span class="w"> </span><span class="nf">poles_to_denominator</span><span class="p">(</span><span class="n">poles</span><span class="p">,</span> <span class="n">check_stability</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">):</span>
 </span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a><span class="sd">    Build a monic denominator polynomial from discrete-time poles.</span>
 </span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a>
@@ -191,7 +191,7 @@ Utils<wbr>.utils    </h1>
 
     </div>
     <a class="headerlink" href="#as_csv"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="as_csv-8"><a href="#as_csv-8"><span class="linenos"> 8</span></a><span class="k">def</span> <span class="nf">as_csv</span><span class="p">(</span><span class="n">csv_title</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">logs</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="as_csv-8"><a href="#as_csv-8"><span class="linenos"> 8</span></a><span class="k">def</span><span class="w"> </span><span class="nf">as_csv</span><span class="p">(</span><span class="n">csv_title</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">logs</span><span class="p">):</span>
 </span><span id="as_csv-9"><a href="#as_csv-9"><span class="linenos"> 9</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Exports a SimLog to a CSV file with columns: time, output, input.</span>
 </span><span id="as_csv-10"><a href="#as_csv-10"><span class="linenos">10</span></a>
 </span><span id="as_csv-11"><a href="#as_csv-11"><span class="linenos">11</span></a><span class="sd">    Args:</span>
@@ -229,7 +229,7 @@ Utils<wbr>.utils    </h1>
 
     </div>
     <a class="headerlink" href="#Place_real_radius"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Place_real_radius-24"><a href="#Place_real_radius-24"><span class="linenos">24</span></a><span class="k">def</span> <span class="nf">Place_real_radius</span><span class="p">(</span><span class="n">plant_tf</span><span class="p">,</span> <span class="n">pole_radius</span><span class="o">=</span><span class="mf">0.85</span><span class="p">,</span> <span class="n">steady_gain</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Place_real_radius-24"><a href="#Place_real_radius-24"><span class="linenos">24</span></a><span class="k">def</span><span class="w"> </span><span class="nf">Place_real_radius</span><span class="p">(</span><span class="n">plant_tf</span><span class="p">,</span> <span class="n">pole_radius</span><span class="o">=</span><span class="mf">0.85</span><span class="p">,</span> <span class="n">steady_gain</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
 </span><span id="Place_real_radius-25"><a href="#Place_real_radius-25"><span class="linenos">25</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Builds a desired closed-loop transfer function with all real poles at a given radius.</span>
 </span><span id="Place_real_radius-26"><a href="#Place_real_radius-26"><span class="linenos">26</span></a>
 </span><span id="Place_real_radius-27"><a href="#Place_real_radius-27"><span class="linenos">27</span></a><span class="sd">    Constructs a TF compatible with ``Compute_Desired_RST``. The denominator degree is</span>
@@ -313,7 +313,7 @@ to achieve the requested DC gain.</p>
 
     </div>
     <a class="headerlink" href="#poles_to_denominator"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="poles_to_denominator-74"><a href="#poles_to_denominator-74"><span class="linenos"> 74</span></a><span class="k">def</span> <span class="nf">poles_to_denominator</span><span class="p">(</span><span class="n">poles</span><span class="p">,</span> <span class="n">check_stability</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="poles_to_denominator-74"><a href="#poles_to_denominator-74"><span class="linenos"> 74</span></a><span class="k">def</span><span class="w"> </span><span class="nf">poles_to_denominator</span><span class="p">(</span><span class="n">poles</span><span class="p">,</span> <span class="n">check_stability</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">):</span>
 </span><span id="poles_to_denominator-75"><a href="#poles_to_denominator-75"><span class="linenos"> 75</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="poles_to_denominator-76"><a href="#poles_to_denominator-76"><span class="linenos"> 76</span></a><span class="sd">    Build a monic denominator polynomial from discrete-time poles.</span>
 </span><span id="poles_to_denominator-77"><a href="#poles_to_denominator-77"><span class="linenos"> 77</span></a>

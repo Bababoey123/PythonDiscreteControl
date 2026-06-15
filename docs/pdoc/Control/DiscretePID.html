@@ -93,13 +93,13 @@
 
                         <label class="view-source-button" for="mod-DiscretePID-view-source"><span>View Source</span></label>
 
-                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-</span><span id="L-2"><a href="#L-2"><span class="linenos">  2</span></a><span class="kn">import</span> <span class="nn">control</span> <span class="k">as</span> <span class="nn">ct</span>
+                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+</span><span id="L-2"><a href="#L-2"><span class="linenos">  2</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">control</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ct</span>
 </span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a>
-</span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="kn">from</span> <span class="nn">Simulation.simulation</span> <span class="kn">import</span> <span class="n">TFSimulator</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">Simulation.simulation</span><span class="w"> </span><span class="kn">import</span> <span class="n">TFSimulator</span>
 </span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a>
 </span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a>
-</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="k">class</span> <span class="nc">DiscretePID</span><span class="p">:</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="k">class</span><span class="w"> </span><span class="nc">DiscretePID</span><span class="p">:</span>
 </span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Discrete PID controller discretised with backward Euler.</span>
 </span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a>
 </span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a><span class="sd">    Supports filtered and unfiltered derivative modes.  Does not implement output</span>
@@ -107,7 +107,7 @@
 </span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a><span class="sd">    equivalent RST polynomial representation for interoperability with ``RSTController``.</span>
 </span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a>
-</span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kp</span><span class="p">,</span> <span class="n">ki</span><span class="p">,</span> <span class="n">kd</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">text_option</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;NotFiltered&quot;</span><span class="p">):</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kp</span><span class="p">,</span> <span class="n">ki</span><span class="p">,</span> <span class="n">kd</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">text_option</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;NotFiltered&quot;</span><span class="p">):</span>
 </span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates an instance of the PID controller and builds its internal transfer function.</span>
 </span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a>
 </span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a><span class="sd">        Args:</span>
@@ -129,7 +129,7 @@
 </span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a>
 </span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">As_RST</span><span class="p">()</span>
 </span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a>
-</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resets the controller&#39;s internal state to zero.</span>
 </span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a>
 </span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a><span class="sd">        Call this before each new simulation run to clear accumulated integral and</span>
@@ -137,7 +137,7 @@
 </span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">controller_sim</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a>
-</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a>    <span class="k">def</span> <span class="nf">setReference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
+</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">setReference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
 </span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the reference setpoint for the controller.</span>
 </span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a>
 </span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a><span class="sd">        Args:</span>
@@ -145,7 +145,7 @@
 </span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">reference</span> <span class="o">=</span> <span class="n">r</span>
 </span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a>
-</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
 </span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Computes the control output u[k] for the current measurement y[k].</span>
 </span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a>
 </span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a><span class="sd">        Computes the error e[k] = r − y[k] and passes it through the PID transfer</span>
@@ -160,7 +160,7 @@
 </span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a>        <span class="n">e</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference</span> <span class="o">-</span> <span class="n">y</span>
 </span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">controller_sim</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 </span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a>
-</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a>    <span class="k">def</span> <span class="nf">As_TransferFunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text_option</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">As_TransferFunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text_option</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 </span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Builds the discrete PID transfer function using backward Euler discretisation.</span>
 </span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a>
 </span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a><span class="sd">        Two modes are available:</span>
@@ -200,7 +200,7 @@
 </span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>            <span class="n">b2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kd</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span>
 </span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>            <span class="k">return</span> <span class="n">ct</span><span class="o">.</span><span class="n">TransferFunction</span><span class="p">([</span><span class="n">b0</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
 </span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>
-</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>    <span class="k">def</span> <span class="nf">As_RST</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">As_RST</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts the PID transfer function into equivalent R, S, T polynomials.</span>
 </span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>
 </span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a><span class="sd">        For a unity-feedback PID the RST representation is:</span>
@@ -228,7 +228,7 @@
 
     </div>
     <a class="headerlink" href="#DiscretePID"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DiscretePID-8"><a href="#DiscretePID-8"><span class="linenos">  8</span></a><span class="k">class</span> <span class="nc">DiscretePID</span><span class="p">:</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DiscretePID-8"><a href="#DiscretePID-8"><span class="linenos">  8</span></a><span class="k">class</span><span class="w"> </span><span class="nc">DiscretePID</span><span class="p">:</span>
 </span><span id="DiscretePID-9"><a href="#DiscretePID-9"><span class="linenos">  9</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Discrete PID controller discretised with backward Euler.</span>
 </span><span id="DiscretePID-10"><a href="#DiscretePID-10"><span class="linenos"> 10</span></a>
 </span><span id="DiscretePID-11"><a href="#DiscretePID-11"><span class="linenos"> 11</span></a><span class="sd">    Supports filtered and unfiltered derivative modes.  Does not implement output</span>
@@ -236,7 +236,7 @@
 </span><span id="DiscretePID-13"><a href="#DiscretePID-13"><span class="linenos"> 13</span></a><span class="sd">    equivalent RST polynomial representation for interoperability with ``RSTController``.</span>
 </span><span id="DiscretePID-14"><a href="#DiscretePID-14"><span class="linenos"> 14</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="DiscretePID-15"><a href="#DiscretePID-15"><span class="linenos"> 15</span></a>
-</span><span id="DiscretePID-16"><a href="#DiscretePID-16"><span class="linenos"> 16</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kp</span><span class="p">,</span> <span class="n">ki</span><span class="p">,</span> <span class="n">kd</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">text_option</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;NotFiltered&quot;</span><span class="p">):</span>
+</span><span id="DiscretePID-16"><a href="#DiscretePID-16"><span class="linenos"> 16</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kp</span><span class="p">,</span> <span class="n">ki</span><span class="p">,</span> <span class="n">kd</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">text_option</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;NotFiltered&quot;</span><span class="p">):</span>
 </span><span id="DiscretePID-17"><a href="#DiscretePID-17"><span class="linenos"> 17</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates an instance of the PID controller and builds its internal transfer function.</span>
 </span><span id="DiscretePID-18"><a href="#DiscretePID-18"><span class="linenos"> 18</span></a>
 </span><span id="DiscretePID-19"><a href="#DiscretePID-19"><span class="linenos"> 19</span></a><span class="sd">        Args:</span>
@@ -258,7 +258,7 @@
 </span><span id="DiscretePID-35"><a href="#DiscretePID-35"><span class="linenos"> 35</span></a>
 </span><span id="DiscretePID-36"><a href="#DiscretePID-36"><span class="linenos"> 36</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">As_RST</span><span class="p">()</span>
 </span><span id="DiscretePID-37"><a href="#DiscretePID-37"><span class="linenos"> 37</span></a>
-</span><span id="DiscretePID-38"><a href="#DiscretePID-38"><span class="linenos"> 38</span></a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="DiscretePID-38"><a href="#DiscretePID-38"><span class="linenos"> 38</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DiscretePID-39"><a href="#DiscretePID-39"><span class="linenos"> 39</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resets the controller&#39;s internal state to zero.</span>
 </span><span id="DiscretePID-40"><a href="#DiscretePID-40"><span class="linenos"> 40</span></a>
 </span><span id="DiscretePID-41"><a href="#DiscretePID-41"><span class="linenos"> 41</span></a><span class="sd">        Call this before each new simulation run to clear accumulated integral and</span>
@@ -266,7 +266,7 @@
 </span><span id="DiscretePID-43"><a href="#DiscretePID-43"><span class="linenos"> 43</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="DiscretePID-44"><a href="#DiscretePID-44"><span class="linenos"> 44</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">controller_sim</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </span><span id="DiscretePID-45"><a href="#DiscretePID-45"><span class="linenos"> 45</span></a>
-</span><span id="DiscretePID-46"><a href="#DiscretePID-46"><span class="linenos"> 46</span></a>    <span class="k">def</span> <span class="nf">setReference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
+</span><span id="DiscretePID-46"><a href="#DiscretePID-46"><span class="linenos"> 46</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">setReference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
 </span><span id="DiscretePID-47"><a href="#DiscretePID-47"><span class="linenos"> 47</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the reference setpoint for the controller.</span>
 </span><span id="DiscretePID-48"><a href="#DiscretePID-48"><span class="linenos"> 48</span></a>
 </span><span id="DiscretePID-49"><a href="#DiscretePID-49"><span class="linenos"> 49</span></a><span class="sd">        Args:</span>
@@ -274,7 +274,7 @@
 </span><span id="DiscretePID-51"><a href="#DiscretePID-51"><span class="linenos"> 51</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="DiscretePID-52"><a href="#DiscretePID-52"><span class="linenos"> 52</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">reference</span> <span class="o">=</span> <span class="n">r</span>
 </span><span id="DiscretePID-53"><a href="#DiscretePID-53"><span class="linenos"> 53</span></a>
-</span><span id="DiscretePID-54"><a href="#DiscretePID-54"><span class="linenos"> 54</span></a>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+</span><span id="DiscretePID-54"><a href="#DiscretePID-54"><span class="linenos"> 54</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
 </span><span id="DiscretePID-55"><a href="#DiscretePID-55"><span class="linenos"> 55</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Computes the control output u[k] for the current measurement y[k].</span>
 </span><span id="DiscretePID-56"><a href="#DiscretePID-56"><span class="linenos"> 56</span></a>
 </span><span id="DiscretePID-57"><a href="#DiscretePID-57"><span class="linenos"> 57</span></a><span class="sd">        Computes the error e[k] = r − y[k] and passes it through the PID transfer</span>
@@ -289,7 +289,7 @@
 </span><span id="DiscretePID-66"><a href="#DiscretePID-66"><span class="linenos"> 66</span></a>        <span class="n">e</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference</span> <span class="o">-</span> <span class="n">y</span>
 </span><span id="DiscretePID-67"><a href="#DiscretePID-67"><span class="linenos"> 67</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">controller_sim</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 </span><span id="DiscretePID-68"><a href="#DiscretePID-68"><span class="linenos"> 68</span></a>
-</span><span id="DiscretePID-69"><a href="#DiscretePID-69"><span class="linenos"> 69</span></a>    <span class="k">def</span> <span class="nf">As_TransferFunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text_option</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+</span><span id="DiscretePID-69"><a href="#DiscretePID-69"><span class="linenos"> 69</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">As_TransferFunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text_option</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 </span><span id="DiscretePID-70"><a href="#DiscretePID-70"><span class="linenos"> 70</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Builds the discrete PID transfer function using backward Euler discretisation.</span>
 </span><span id="DiscretePID-71"><a href="#DiscretePID-71"><span class="linenos"> 71</span></a>
 </span><span id="DiscretePID-72"><a href="#DiscretePID-72"><span class="linenos"> 72</span></a><span class="sd">        Two modes are available:</span>
@@ -329,7 +329,7 @@
 </span><span id="DiscretePID-106"><a href="#DiscretePID-106"><span class="linenos">106</span></a>            <span class="n">b2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kd</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span>
 </span><span id="DiscretePID-107"><a href="#DiscretePID-107"><span class="linenos">107</span></a>            <span class="k">return</span> <span class="n">ct</span><span class="o">.</span><span class="n">TransferFunction</span><span class="p">([</span><span class="n">b0</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
 </span><span id="DiscretePID-108"><a href="#DiscretePID-108"><span class="linenos">108</span></a>
-</span><span id="DiscretePID-109"><a href="#DiscretePID-109"><span class="linenos">109</span></a>    <span class="k">def</span> <span class="nf">As_RST</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="DiscretePID-109"><a href="#DiscretePID-109"><span class="linenos">109</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">As_RST</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DiscretePID-110"><a href="#DiscretePID-110"><span class="linenos">110</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts the PID transfer function into equivalent R, S, T polynomials.</span>
 </span><span id="DiscretePID-111"><a href="#DiscretePID-111"><span class="linenos">111</span></a>
 </span><span id="DiscretePID-112"><a href="#DiscretePID-112"><span class="linenos">112</span></a><span class="sd">        For a unity-feedback PID the RST representation is:</span>
@@ -363,7 +363,7 @@ equivalent RST polynomial representation for interoperability with <code>RSTCont
 
     </div>
     <a class="headerlink" href="#DiscretePID.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DiscretePID.__init__-16"><a href="#DiscretePID.__init__-16"><span class="linenos">16</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kp</span><span class="p">,</span> <span class="n">ki</span><span class="p">,</span> <span class="n">kd</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">text_option</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;NotFiltered&quot;</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DiscretePID.__init__-16"><a href="#DiscretePID.__init__-16"><span class="linenos">16</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kp</span><span class="p">,</span> <span class="n">ki</span><span class="p">,</span> <span class="n">kd</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">text_option</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;NotFiltered&quot;</span><span class="p">):</span>
 </span><span id="DiscretePID.__init__-17"><a href="#DiscretePID.__init__-17"><span class="linenos">17</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates an instance of the PID controller and builds its internal transfer function.</span>
 </span><span id="DiscretePID.__init__-18"><a href="#DiscretePID.__init__-18"><span class="linenos">18</span></a>
 </span><span id="DiscretePID.__init__-19"><a href="#DiscretePID.__init__-19"><span class="linenos">19</span></a><span class="sd">        Args:</span>
@@ -478,7 +478,7 @@ equivalent RST polynomial representation for interoperability with <code>RSTCont
 
     </div>
     <a class="headerlink" href="#DiscretePID.reset"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DiscretePID.reset-38"><a href="#DiscretePID.reset-38"><span class="linenos">38</span></a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DiscretePID.reset-38"><a href="#DiscretePID.reset-38"><span class="linenos">38</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DiscretePID.reset-39"><a href="#DiscretePID.reset-39"><span class="linenos">39</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resets the controller&#39;s internal state to zero.</span>
 </span><span id="DiscretePID.reset-40"><a href="#DiscretePID.reset-40"><span class="linenos">40</span></a>
 </span><span id="DiscretePID.reset-41"><a href="#DiscretePID.reset-41"><span class="linenos">41</span></a><span class="sd">        Call this before each new simulation run to clear accumulated integral and</span>
@@ -507,7 +507,7 @@ derivative history from the previous run.</p>
 
     </div>
     <a class="headerlink" href="#DiscretePID.setReference"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DiscretePID.setReference-46"><a href="#DiscretePID.setReference-46"><span class="linenos">46</span></a>    <span class="k">def</span> <span class="nf">setReference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DiscretePID.setReference-46"><a href="#DiscretePID.setReference-46"><span class="linenos">46</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">setReference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
 </span><span id="DiscretePID.setReference-47"><a href="#DiscretePID.setReference-47"><span class="linenos">47</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the reference setpoint for the controller.</span>
 </span><span id="DiscretePID.setReference-48"><a href="#DiscretePID.setReference-48"><span class="linenos">48</span></a>
 </span><span id="DiscretePID.setReference-49"><a href="#DiscretePID.setReference-49"><span class="linenos">49</span></a><span class="sd">        Args:</span>
@@ -536,7 +536,7 @@ derivative history from the previous run.</p>
 
     </div>
     <a class="headerlink" href="#DiscretePID.step"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DiscretePID.step-54"><a href="#DiscretePID.step-54"><span class="linenos">54</span></a>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DiscretePID.step-54"><a href="#DiscretePID.step-54"><span class="linenos">54</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
 </span><span id="DiscretePID.step-55"><a href="#DiscretePID.step-55"><span class="linenos">55</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Computes the control output u[k] for the current measurement y[k].</span>
 </span><span id="DiscretePID.step-56"><a href="#DiscretePID.step-56"><span class="linenos">56</span></a>
 </span><span id="DiscretePID.step-57"><a href="#DiscretePID.step-57"><span class="linenos">57</span></a><span class="sd">        Computes the error e[k] = r − y[k] and passes it through the PID transfer</span>
@@ -578,7 +578,7 @@ function implemented as a difference equation in <code>TFSimulator</code>.</p>
 
     </div>
     <a class="headerlink" href="#DiscretePID.As_TransferFunction"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DiscretePID.As_TransferFunction-69"><a href="#DiscretePID.As_TransferFunction-69"><span class="linenos"> 69</span></a>    <span class="k">def</span> <span class="nf">As_TransferFunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text_option</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DiscretePID.As_TransferFunction-69"><a href="#DiscretePID.As_TransferFunction-69"><span class="linenos"> 69</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">As_TransferFunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text_option</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 </span><span id="DiscretePID.As_TransferFunction-70"><a href="#DiscretePID.As_TransferFunction-70"><span class="linenos"> 70</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Builds the discrete PID transfer function using backward Euler discretisation.</span>
 </span><span id="DiscretePID.As_TransferFunction-71"><a href="#DiscretePID.As_TransferFunction-71"><span class="linenos"> 71</span></a>
 </span><span id="DiscretePID.As_TransferFunction-72"><a href="#DiscretePID.As_TransferFunction-72"><span class="linenos"> 72</span></a><span class="sd">        Two modes are available:</span>
@@ -661,7 +661,7 @@ function implemented as a difference equation in <code>TFSimulator</code>.</p>
 
     </div>
     <a class="headerlink" href="#DiscretePID.As_RST"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DiscretePID.As_RST-109"><a href="#DiscretePID.As_RST-109"><span class="linenos">109</span></a>    <span class="k">def</span> <span class="nf">As_RST</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DiscretePID.As_RST-109"><a href="#DiscretePID.As_RST-109"><span class="linenos">109</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">As_RST</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DiscretePID.As_RST-110"><a href="#DiscretePID.As_RST-110"><span class="linenos">110</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts the PID transfer function into equivalent R, S, T polynomials.</span>
 </span><span id="DiscretePID.As_RST-111"><a href="#DiscretePID.As_RST-111"><span class="linenos">111</span></a>
 </span><span id="DiscretePID.As_RST-112"><a href="#DiscretePID.As_RST-112"><span class="linenos">112</span></a><span class="sd">        For a unity-feedback PID the RST representation is:</span>

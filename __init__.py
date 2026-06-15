@@ -22,36 +22,39 @@ Core Features
 
 3. Hybrid simulation environment
    - Discrete controller evaluated at fixed sampling time
-   - Continuous plant updated at a finer integration timestep
+   - Continuous plant updated at a finer integration timestep (1 ms by default)
+   - Supports both linear (HybridSim) and nonlinear (NonLinearHybridSim) plants
    - Emulates real digital control hardware interacting with physical systems
 
 4. Control architectures
-   - PID controllers implemented as discrete transfer functions
-   - RST controllers using polynomial representations (R, S, T)
-   - Unified interface for future controller extensions (LQR, MPC, etc.)
+   - PID controllers implemented as discrete transfer functions (Backward-Euler)
+   - RST polynomial controllers (two-degree-of-freedom, Diophantine-based synthesis)
+   - Unified step/setReference interface for all controllers
 
 Architecture Overview
 ---------------------
-The library is structured around three main abstraction layers:
+The library is structured around four main abstraction layers:
 
 - Simulation layer:
   Implements numerical evolution of systems:
-  TFSimulator, HybridControlLoop
+  TFSimulator, HybridSim, NonLinearHybridSim
 
 - Control layer:
   Implements discrete controllers:
   DiscretePID, RSTController
 
 - Models layer:
-  Contains the configuration file with the simulations parameters (dt, the sampling time and T, the simulations lengh)
+  Contains the configuration file with simulation parameters (dt, T).
   Defines plant representations:
-  StateSpaceModel, TransferFunctionModel
-  
+  TransferFunctionModel, LinearStateSpaceModel, NonlinearBallBeamModel
+
 - Metrics_Plotting layer:
-  Used to log the responses of the simulations, will also include different poltting functions  
-  
-- Utils 
-    Contains helper functions such as a CSV file generator (will also contain a RST controller maker)
+  Logs simulation data (SimLog) and computes performance metrics
+  (rise time, settling time, overshoot, stability margins).
+
+- Utils:
+  RST polynomial synthesis (computeRST), pole placement helpers,
+  and CSV export (utils).
 
 Design Philosophy
 ------------------
@@ -69,5 +72,4 @@ This allows systematic validation of:
 - Sampling time influence
 - Numerical integration errors
 - Controller implementation consistency
-
 """

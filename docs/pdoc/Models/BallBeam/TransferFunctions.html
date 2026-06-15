@@ -65,22 +65,22 @@
     <main class="pdoc">
             <section class="module-info">
                     <h1 class="modulename">
-Models<wbr>.<a href="./../BallBeam.html">BallBeam</a><wbr>.TransferFunctions    </h1>
+<a href="./../../Models.html">Models</a><wbr>.<a href="./../BallBeam.html">BallBeam</a><wbr>.TransferFunctions    </h1>
 
                 
                         <input id="mod-TransferFunctions-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 
                         <label class="view-source-button" for="mod-TransferFunctions-view-source"><span>View Source</span></label>
 
-                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-</span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="kn">import</span> <span class="nn">control</span> <span class="k">as</span> <span class="nn">ct</span>
+                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+</span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">control</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ct</span>
 </span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a>
-</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="k">class</span> <span class="nc">TransferFunctionModel</span><span class="p">:</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="k">class</span><span class="w"> </span><span class="nc">TransferFunctionModel</span><span class="p">:</span>
 </span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Continuous and ZOH-discretised transfer functions of the ball-and-beam plant.</span>
 </span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a>
 </span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="sd">    The continuous plant is a double integrator: H(s) = H / s².</span>
 </span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_file</span><span class="p">):</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_file</span><span class="p">):</span>
 </span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Builds the continuous TF and its ZOH discretisation, then extracts coefficient arrays.</span>
 </span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>
 </span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="sd">        Args:</span>
@@ -110,12 +110,12 @@ Models<wbr>.<a href="./../BallBeam.html">BallBeam</a><wbr>.TransferFunctions    
 
     </div>
     <a class="headerlink" href="#TransferFunctionModel"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="TransferFunctionModel-5"><a href="#TransferFunctionModel-5"><span class="linenos"> 5</span></a><span class="k">class</span> <span class="nc">TransferFunctionModel</span><span class="p">:</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="TransferFunctionModel-5"><a href="#TransferFunctionModel-5"><span class="linenos"> 5</span></a><span class="k">class</span><span class="w"> </span><span class="nc">TransferFunctionModel</span><span class="p">:</span>
 </span><span id="TransferFunctionModel-6"><a href="#TransferFunctionModel-6"><span class="linenos"> 6</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Continuous and ZOH-discretised transfer functions of the ball-and-beam plant.</span>
 </span><span id="TransferFunctionModel-7"><a href="#TransferFunctionModel-7"><span class="linenos"> 7</span></a>
 </span><span id="TransferFunctionModel-8"><a href="#TransferFunctionModel-8"><span class="linenos"> 8</span></a><span class="sd">    The continuous plant is a double integrator: H(s) = H / s².</span>
 </span><span id="TransferFunctionModel-9"><a href="#TransferFunctionModel-9"><span class="linenos"> 9</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="TransferFunctionModel-10"><a href="#TransferFunctionModel-10"><span class="linenos">10</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_file</span><span class="p">):</span>
+</span><span id="TransferFunctionModel-10"><a href="#TransferFunctionModel-10"><span class="linenos">10</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_file</span><span class="p">):</span>
 </span><span id="TransferFunctionModel-11"><a href="#TransferFunctionModel-11"><span class="linenos">11</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Builds the continuous TF and its ZOH discretisation, then extracts coefficient arrays.</span>
 </span><span id="TransferFunctionModel-12"><a href="#TransferFunctionModel-12"><span class="linenos">12</span></a>
 </span><span id="TransferFunctionModel-13"><a href="#TransferFunctionModel-13"><span class="linenos">13</span></a><span class="sd">        Args:</span>
@@ -148,7 +148,7 @@ Models<wbr>.<a href="./../BallBeam.html">BallBeam</a><wbr>.TransferFunctions    
 
     </div>
     <a class="headerlink" href="#TransferFunctionModel.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="TransferFunctionModel.__init__-10"><a href="#TransferFunctionModel.__init__-10"><span class="linenos">10</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_file</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="TransferFunctionModel.__init__-10"><a href="#TransferFunctionModel.__init__-10"><span class="linenos">10</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_file</span><span class="p">):</span>
 </span><span id="TransferFunctionModel.__init__-11"><a href="#TransferFunctionModel.__init__-11"><span class="linenos">11</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Builds the continuous TF and its ZOH discretisation, then extracts coefficient arrays.</span>
 </span><span id="TransferFunctionModel.__init__-12"><a href="#TransferFunctionModel.__init__-12"><span class="linenos">12</span></a>
 </span><span id="TransferFunctionModel.__init__-13"><a href="#TransferFunctionModel.__init__-13"><span class="linenos">13</span></a><span class="sd">        Args:</span>

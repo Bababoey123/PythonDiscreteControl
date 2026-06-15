@@ -77,7 +77,7 @@
     <main class="pdoc">
             <section class="module-info">
                     <h1 class="modulename">
-Models<wbr>.<a href="./../BallBeam.html">BallBeam</a><wbr>.NonlinearDynamics    </h1>
+<a href="./../../Models.html">Models</a><wbr>.<a href="./../BallBeam.html">BallBeam</a><wbr>.NonlinearDynamics    </h1>
 
                         <div class="docstring"><p>Nonlinear dynamics of the ball-and-beam system.</p>
 
@@ -99,10 +99,10 @@ assumption that the servo actuator is fast enough to track its reference exactly
 </span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="sd">assumption that the servo actuator is fast enough to track its reference exactly.</span>
 </span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 </span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>
 </span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="k">class</span> <span class="nc">NonlinearBallBeamModel</span><span class="p">:</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="k">class</span><span class="w"> </span><span class="nc">NonlinearBallBeamModel</span><span class="p">:</span>
 </span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Nonlinear ODE model of the ball-and-beam plant.</span>
 </span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>
 </span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="sd">    State vector: X = [[r], [ṙ]]</span>
@@ -114,7 +114,7 @@ assumption that the servo actuator is fast enough to track its reference exactly
 </span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a><span class="sd">    where α = (d/L)·u is the beam tilt angle computed from the servo command u.</span>
 </span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>
-</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_file</span><span class="p">):</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_file</span><span class="p">):</span>
 </span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Stores all physical parameters from the configuration module.</span>
 </span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>
 </span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a><span class="sd">        Args:</span>
@@ -129,7 +129,7 @@ assumption that the servo actuator is fast enough to track its reference exactly
 </span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="o">=</span> <span class="n">config_file</span><span class="o">.</span><span class="n">L</span>
 </span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">config_file</span> <span class="o">=</span> <span class="n">config_file</span>
 </span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a>
-</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a>    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">u</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">u</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 </span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Evaluates the nonlinear state derivative  Ẋ = f(X, u).</span>
 </span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a>
 </span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a><span class="sd">        The servo angle is mapped linearly from the control input:</span>
@@ -167,7 +167,7 @@ assumption that the servo actuator is fast enough to track its reference exactly
 
     </div>
     <a class="headerlink" href="#NonlinearBallBeamModel"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="NonlinearBallBeamModel-13"><a href="#NonlinearBallBeamModel-13"><span class="linenos">13</span></a><span class="k">class</span> <span class="nc">NonlinearBallBeamModel</span><span class="p">:</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="NonlinearBallBeamModel-13"><a href="#NonlinearBallBeamModel-13"><span class="linenos">13</span></a><span class="k">class</span><span class="w"> </span><span class="nc">NonlinearBallBeamModel</span><span class="p">:</span>
 </span><span id="NonlinearBallBeamModel-14"><a href="#NonlinearBallBeamModel-14"><span class="linenos">14</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Nonlinear ODE model of the ball-and-beam plant.</span>
 </span><span id="NonlinearBallBeamModel-15"><a href="#NonlinearBallBeamModel-15"><span class="linenos">15</span></a>
 </span><span id="NonlinearBallBeamModel-16"><a href="#NonlinearBallBeamModel-16"><span class="linenos">16</span></a><span class="sd">    State vector: X = [[r], [ṙ]]</span>
@@ -179,7 +179,7 @@ assumption that the servo actuator is fast enough to track its reference exactly
 </span><span id="NonlinearBallBeamModel-22"><a href="#NonlinearBallBeamModel-22"><span class="linenos">22</span></a><span class="sd">    where α = (d/L)·u is the beam tilt angle computed from the servo command u.</span>
 </span><span id="NonlinearBallBeamModel-23"><a href="#NonlinearBallBeamModel-23"><span class="linenos">23</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="NonlinearBallBeamModel-24"><a href="#NonlinearBallBeamModel-24"><span class="linenos">24</span></a>
-</span><span id="NonlinearBallBeamModel-25"><a href="#NonlinearBallBeamModel-25"><span class="linenos">25</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_file</span><span class="p">):</span>
+</span><span id="NonlinearBallBeamModel-25"><a href="#NonlinearBallBeamModel-25"><span class="linenos">25</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_file</span><span class="p">):</span>
 </span><span id="NonlinearBallBeamModel-26"><a href="#NonlinearBallBeamModel-26"><span class="linenos">26</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Stores all physical parameters from the configuration module.</span>
 </span><span id="NonlinearBallBeamModel-27"><a href="#NonlinearBallBeamModel-27"><span class="linenos">27</span></a>
 </span><span id="NonlinearBallBeamModel-28"><a href="#NonlinearBallBeamModel-28"><span class="linenos">28</span></a><span class="sd">        Args:</span>
@@ -194,7 +194,7 @@ assumption that the servo actuator is fast enough to track its reference exactly
 </span><span id="NonlinearBallBeamModel-37"><a href="#NonlinearBallBeamModel-37"><span class="linenos">37</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="o">=</span> <span class="n">config_file</span><span class="o">.</span><span class="n">L</span>
 </span><span id="NonlinearBallBeamModel-38"><a href="#NonlinearBallBeamModel-38"><span class="linenos">38</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">config_file</span> <span class="o">=</span> <span class="n">config_file</span>
 </span><span id="NonlinearBallBeamModel-39"><a href="#NonlinearBallBeamModel-39"><span class="linenos">39</span></a>
-</span><span id="NonlinearBallBeamModel-40"><a href="#NonlinearBallBeamModel-40"><span class="linenos">40</span></a>    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">u</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+</span><span id="NonlinearBallBeamModel-40"><a href="#NonlinearBallBeamModel-40"><span class="linenos">40</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">u</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 </span><span id="NonlinearBallBeamModel-41"><a href="#NonlinearBallBeamModel-41"><span class="linenos">41</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Evaluates the nonlinear state derivative  Ẋ = f(X, u).</span>
 </span><span id="NonlinearBallBeamModel-42"><a href="#NonlinearBallBeamModel-42"><span class="linenos">42</span></a>
 </span><span id="NonlinearBallBeamModel-43"><a href="#NonlinearBallBeamModel-43"><span class="linenos">43</span></a><span class="sd">        The servo angle is mapped linearly from the control input:</span>
@@ -242,7 +242,7 @@ where α = (d/L)·u is the beam tilt angle computed from the servo command u.</p
 
     </div>
     <a class="headerlink" href="#NonlinearBallBeamModel.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="NonlinearBallBeamModel.__init__-25"><a href="#NonlinearBallBeamModel.__init__-25"><span class="linenos">25</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_file</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="NonlinearBallBeamModel.__init__-25"><a href="#NonlinearBallBeamModel.__init__-25"><span class="linenos">25</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_file</span><span class="p">):</span>
 </span><span id="NonlinearBallBeamModel.__init__-26"><a href="#NonlinearBallBeamModel.__init__-26"><span class="linenos">26</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Stores all physical parameters from the configuration module.</span>
 </span><span id="NonlinearBallBeamModel.__init__-27"><a href="#NonlinearBallBeamModel.__init__-27"><span class="linenos">27</span></a>
 </span><span id="NonlinearBallBeamModel.__init__-28"><a href="#NonlinearBallBeamModel.__init__-28"><span class="linenos">28</span></a><span class="sd">        Args:</span>
@@ -356,7 +356,7 @@ where α = (d/L)·u is the beam tilt angle computed from the servo command u.</p
 
     </div>
     <a class="headerlink" href="#NonlinearBallBeamModel.f"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="NonlinearBallBeamModel.f-40"><a href="#NonlinearBallBeamModel.f-40"><span class="linenos">40</span></a>    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">u</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="NonlinearBallBeamModel.f-40"><a href="#NonlinearBallBeamModel.f-40"><span class="linenos">40</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">u</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 </span><span id="NonlinearBallBeamModel.f-41"><a href="#NonlinearBallBeamModel.f-41"><span class="linenos">41</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Evaluates the nonlinear state derivative  Ẋ = f(X, u).</span>
 </span><span id="NonlinearBallBeamModel.f-42"><a href="#NonlinearBallBeamModel.f-42"><span class="linenos">42</span></a>
 </span><span id="NonlinearBallBeamModel.f-43"><a href="#NonlinearBallBeamModel.f-43"><span class="linenos">43</span></a><span class="sd">        The servo angle is mapped linearly from the control input:</span>
