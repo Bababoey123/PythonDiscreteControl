@@ -24,9 +24,9 @@ def trim(p):
 def conv_matrix(a, n):
     """Builds the convolution (Toeplitz) matrix for polynomial multiplication.
 
-    Returns a matrix A such that  A @ x == np.convolve(a, x)  for any length-n
-    vector x.  This lets the Diophantine equation A·S + B·R = A_cl be written as
-    a linear system M·θ = A_cl and solved with least squares.
+    Returns a matrix M such that  M @ x == np.convolve(a, x)  for any length-n
+    vector x.  This lets the Diophantine equation A·S + B·R = A_m be written as
+    a linear system M·θ = A_m and solved with least squares.
 
     The returned matrix has shape (len(a) + n − 1, n).
 
@@ -49,69 +49,69 @@ def conv_matrix(a, n):
 def Compute_Denominator_Matching_RST(A_cl: list, plant_discrete_tf, Integrator=True, A0=None):
     """RST synthesis by denominator (characteristic polynomial) matching.
 
-    Computes the S, R, T polynomials such that the closed-loop characteristic polynomial
-    of the RST-controlled plant equals ``A_cl * A0``.  The control law is:
-        v[k] = T·r[k] − R·y[k]
-        u[k] = (1/S) · v[k]
+    Computes S, R, T using the Landau observer polynomial formulation.  The algorithm
+    proceeds in two stages:
 
-    The denominator of the desired closed-loop transfer function is specified directly as
-    a coefficient list ``A_cl``.  Only the pole locations are prescribed; the numerator
-    (and therefore the DC gain) is determined by computing T from the unity-DC-gain
-    condition  T(1) = A_cl(1) / B(1).
+      1. Solve the *reduced* Diophantine for S', R' using only the dominant polynomial:
+             A_eff(z) · S'(z) + B(z) · R'(z) = A_m(z)
+         where A_eff = A*(z-1) when Integrator=True.
 
-    Use ``Compute_Desired_RST`` instead if you also want to prescribe the closed-loop
-    numerator (and hence the exact transient shape).
+      2. Apply the observer polynomial factor:
+             S = A0 · S',   R = A0 · R',   T = t0 · A0
+         so that  A·S + B·R = A0·(A·S' + B·R') = A0 · A_m  and A0 cancels from
+         the reference-to-output transfer function:
+             H_ry = B·T / (A·S + B·R) = t0·B / A_m   (A0-poles are invisible to r)
 
-    Hardcoded values
-    ----------------
-    INT = [1, −1]
-        When ``Integrator=True`` the plant denominator is augmented by (z−1) to
-        enforce an integrator in the loop, guaranteeing zero steady-state error for
-        step references.
-    Least-squares solve (``np.linalg.lstsq``)
-        The Diophantine system may be slightly over- or under-determined depending on
-        polynomial degrees.  Least squares finds the minimum-norm solution in both cases.
+    The scalar gain t0 = A_m(1) / B(1) enforces unity DC gain.
+
+    Degree constraint
+    -----------------
+    ``A_cl`` (the dominant polynomial, *not* including A0) must satisfy:
+        deg(A_cl) ≤ deg(A) + deg(B)   (non-integrator)
+        deg(A_cl) ≤ deg(A) + deg(B)   (integrator — same bound, exactly determined)
+    A0 may have any degree; it is applied after the Diophantine solve.
 
     Args:
-        A_cl (list): Coefficients of the desired dominant closed-loop characteristic
-            polynomial in descending powers of z (need not be monic; it is normalised
-            internally).
+        A_cl (list): Coefficients of the *dominant* closed-loop characteristic
+            polynomial A_m(z) in descending powers of z.  Must NOT include the
+            observer polynomial A0 — pass only the pole locations you want to dominate
+            the transient response.
         plant_discrete_tf (ct.TransferFunction): Discrete plant transfer function B(z)/A(z).
-        Integrator (bool, optional): If True, forces S to contain the factor (z−1) to
-            guarantee zero steady-state error for step references.  Defaults to True.
-        A0 (array-like or None, optional): Observer polynomial whose roots are additional
-            (faster) closed-loop poles.  The total desired characteristic polynomial becomes
-            ``A_cl * A0``.  Pass None for no observer poles.  Defaults to None.
+        Integrator (bool, optional): If True, forces S to contain (z-1) to guarantee
+            zero steady-state error for step references.  Defaults to True.
+        A0 (array-like or None, optional): Observer polynomial.  Its roots are additional
+            closed-loop poles placed faster than A_m; they cancel from the reference path.
+            Pass None for no observer poles (equivalent to A0=1).  Defaults to None.
 
     Returns:
         tuple:
             S_tf (ct.TransferFunction): S polynomial as a discrete TF with denominator 1.
             R_tf (ct.TransferFunction): R polynomial as a discrete TF with denominator 1.
             T_tf (ct.TransferFunction): T polynomial as a discrete TF with denominator 1.
-            H_cl (ct.TransferFunction): Closed-loop transfer function B·T / (A·S + B·R)
-                computed for verification.
+            H_cl (ct.TransferFunction): Closed-loop transfer function B·T / (A·S + B·R).
 
     Raises:
-        ValueError: If ``A_cl`` degree exceeds the controller structure capacity, or if
-            ``A_cl * A0`` contains unstable poles.
+        ValueError: If A_cl degree exceeds the controller structure capacity, or if
+            A_m * A0 contains unstable poles.
     """
     # ------------------------------------------------------------
-    # 1. Extract polynomials
+    # 1. Extract and normalise plant polynomials
     # ------------------------------------------------------------
     A = trim(plant_discrete_tf.den[0][0])
     B = trim(plant_discrete_tf.num[0][0])
+    a_lead = A[0]
+    A = A / a_lead   # make A monic
+    B = B / a_lead   # scale B consistently
 
-    # Normalize the plant denominator to make the Diophantine equation monic.
-    A = A / A[0]
-
-    A_cl_original = trim(np.asarray(A_cl, dtype=float))
-    A_cl_original = A_cl_original / A_cl_original[0]
+    # A_cl is the dominant polynomial A_m (does NOT include A0)
+    A_m = trim(np.asarray(A_cl, dtype=float))
+    A_m = A_m / A_m[0]   # make monic
 
     A0 = trim(np.asarray(A0 if A0 is not None else [1.0], dtype=float))
-    A0 = A0 / A0[0]
+    A0 = A0 / A0[0]   # make monic
 
-    # Total desired denominator: dominant poles * observer polynomial
-    A_cl = trim(np.convolve(A_cl_original, A0))
+    # Total desired characteristic polynomial: A_m * A0
+    A_cl_total = trim(np.convolve(A_m, A0))
 
     deg_A = len(A) - 1
     deg_B = len(B) - 1
@@ -119,40 +119,24 @@ def Compute_Denominator_Matching_RST(A_cl: list, plant_discrete_tf, Integrator=T
     INT = np.array([1.0, -1.0])
 
     # ============================================================================
-    # 2. Choose controller structure orders
-    # ============================================================================
-    # Goal: A*S + B*R = A_cl * A0  (where A_cl * A0 is the total desired denominator)
+    # 2. Choose controller structure orders (determined by plant, not by A0)
     #
-    # The convolution matrix M has deg_A + deg_B + 1 rows regardless of A0.
-    # This caps the total desired polynomial degree: deg(A_cl) + deg(A0) <= deg_A + deg_B.
-    # If that bound is exceeded the length check below raises a ValueError.
+    # The Diophantine is solved for S', R' of the same degrees as without A0.
+    # A0 is then multiplied in after the solve (Landau two-step formulation).
     #
-    # NON-INTEGRATOR CASE (Integrator=False):
-    #   - deg(S) = deg(B), deg(R) = deg(A)
-    #   - M rows = deg_A + deg_B + 1  (one extra row → system underdetermined by 1,
-    #     solved with zero-padding on the target vector)
-    #
-    # INTEGRATOR CASE (Integrator=True):
-    #   - S = (z-1) * S_tilde,  deg(S_tilde) = deg(B) - 1
-    #   - The modified plant A*(z-1) has degree deg_A + 1
-    #   - M rows = (deg_A+2) + (deg_B-1) - 1 = deg_A + deg_B + 1  (exactly determined)
-    #   - Guarantees zero steady-state error for step references.
+    # NON-INTEGRATOR:  deg(S') = deg(B),  deg(R') = deg(A)
+    # INTEGRATOR:      S' = (z-1)·S_tilde',  deg(S_tilde') = deg(B)-1
     # ============================================================================
     if Integrator:
-        deg_S = deg_B - 1
+        deg_S_tilde = deg_B - 1
     else:
-        deg_S = deg_B
+        deg_S_tilde = deg_B
     deg_R = deg_A
-    nS = max(deg_S + 1, 1)
+    nS = max(deg_S_tilde + 1, 1)
     nR = deg_R + 1
 
     # ============================================================================
-    # 3. Build Diophantine equation:
-    #       A(z)*S(z) + B(z)*R(z) = A_cl(z) * A0(z)
-    #
-    # Integrator case substitutes A_eff = A(z)*(z-1) and solves for S_tilde:
-    #       A_eff(z)*S_tilde(z) + B(z)*R(z) = A_cl(z) * A0(z)
-    # then recovers S = (z-1) * S_tilde after the solve.
+    # 3. Build reduced Diophantine:  A_eff · S_tilde' + B · R' = A_m
     # ============================================================================
     if Integrator:
         AS = conv_matrix(np.convolve(A, INT), nS)
@@ -160,87 +144,102 @@ def Compute_Denominator_Matching_RST(A_cl: list, plant_discrete_tf, Integrator=T
         AS = conv_matrix(A, nS)
 
     BR = conv_matrix(B, nR)
-    M = np.hstack([AS, BR]) # stacking horizontally the AS and BR toeplitz matrices forming the M matrix 
+    M = np.hstack([AS, BR])
 
-    # Desired denominator must fit the R/S structure and remain stable for a bounded step response.
+    # Degree constraint applies to the dominant polynomial A_m only
     target_len = M.shape[0]
-    if len(A_cl) > target_len:
+    if len(A_m) > target_len:
         raise ValueError(
-            "Desired closed-loop denominator A_cl is too high order for the chosen R/S structure. "
-            "Use a lower-order desired TF or increase controller order."
+            f"Dominant polynomial A_cl (degree {len(A_m) - 1}) exceeds the system capacity "
+            f"(max degree {target_len - 1} for this plant/structure). "
+            "Reduce A_cl degree. Note: A0 observer poles are added separately and do not "
+            "consume this budget."
         )
-    A_cl = np.r_[A_cl, np.zeros(target_len - len(A_cl))]
+    # Prepend leading zeros so the polynomial lives at the correct degree
+    # inside the Toeplitz system (coefficient order: highest power first).
+    A_m_padded = np.r_[np.zeros(target_len - len(A_m)), A_m]
 
-    poles = np.roots(A_cl)
-    unstable = np.abs(poles) > 1.0 + 1e-8
-    if np.any(unstable):
+    # Stability check on the total characteristic polynomial A_m * A0
+    poles_total = np.roots(A_cl_total)
+    if np.any(np.abs(poles_total) > 1.0 + 1e-8):
         raise ValueError(
-            "Desired closed-loop denominator A_cl * A0 must have all poles strictly inside or on the unit circle."
+            "A_cl * A0 contains poles outside the unit circle. "
+            "Ensure all roots of A_cl and A0 are inside the unit disk."
         )
-
-    if np.any(np.isclose(np.abs(poles), 1.0, atol=1e-8)):
+    if np.any(np.isclose(np.abs(poles_total), 1.0, atol=1e-8)):
         warnings.warn(
-            "Desired closed-loop denominator A_cl * A0 contains a pole on the unit circle. "
-            "Closed-loop response may be marginally stable or unbounded for some inputs.",
+            "A_cl * A0 contains a pole on the unit circle. "
+            "Closed-loop response may be marginally stable.",
             UserWarning
         )
 
-    # Solve
-    theta, *_ = np.linalg.lstsq(M, A_cl, rcond=None)
-    # via the least squares method, this gives the most exact approximate solution 
-
-    S_tilde = theta[:nS] # extracting the first coeficients into S
-    R_coeffs = theta[nS:] # and the remaining into R
+    # ------------------------------------------------------------
+    # 4. Solve reduced Diophantine for S_tilde', R'
+    # ------------------------------------------------------------
+    theta, *_ = np.linalg.lstsq(M, A_m_padded, rcond=None)
+    S_tilde_prime = theta[:nS]
+    R_prime = theta[nS:]
 
     if Integrator:
-        S_coeffs = np.convolve(S_tilde, INT)
+        S_prime = np.convolve(S_tilde_prime, INT)   # S' = (z-1) · S_tilde'
     else:
-        S_coeffs = S_tilde
-
-    # Verify denominator matching for sanity: A*S + B*R = A_cl * A0
-    den_check = np.polyadd(np.polymul(A, S_coeffs), np.polymul(B, R_coeffs))
-    A_cl_check = A_cl.copy()
-    if len(den_check) < len(A_cl_check):
-        den_check = np.r_[np.zeros(len(A_cl_check) - len(den_check)), den_check]
-    elif len(A_cl_check) < len(den_check):
-        A_cl_check = np.r_[np.zeros(len(den_check) - len(A_cl_check)), A_cl_check]
-
-    #if not np.allclose(den_check, A_cl_check, atol=1e-8):
-    #    raise ValueError(
-    #        "RST denominator synthesis failed: A*S + B*R does not equal desired A_cl * A0."
-    #    )
+        S_prime = S_tilde_prime
 
     # ------------------------------------------------------------
-    # 4. Compute T
+    # 5. Observer polynomial factorisation:  S = A0 · S',  R = A0 · R'
+    #
+    #    A·S + B·R = A·(A0·S') + B·(A0·R') = A0·(A·S' + B·R') = A0 · A_m = A_cl_total
+    # ------------------------------------------------------------
+    S_coeffs = np.convolve(A0, S_prime)
+    R_coeffs = np.convolve(A0, R_prime)
+
+    # Verify: A*S + B*R should equal A_cl_total = A_m * A0
+    den_check = np.polyadd(np.polymul(A, S_coeffs), np.polymul(B, R_coeffs))
+    A_cl_v = A_cl_total.copy()
+    pad = max(len(den_check), len(A_cl_v))
+    den_check_p = np.r_[np.zeros(pad - len(den_check)), den_check]
+    A_cl_v_p = np.r_[np.zeros(pad - len(A_cl_v)), A_cl_v]
+    if not np.allclose(den_check_p, A_cl_v_p, atol=1e-6):
+        warnings.warn(
+            "Numerical check: A*S + B*R does not closely match A_m * A0. "
+            "The plant may be poorly conditioned.",
+            UserWarning
+        )
+
+    # ------------------------------------------------------------
+    # 6. Compute T = t0 · A0
+    #
+    #    H_ry = B·T / (A·S + B·R) = B·(t0·A0) / (A_m·A0) = t0·B / A_m
+    #    DC gain condition: t0 · B(1) / A_m(1) = 1  =>  t0 = A_m(1) / B(1)
+    #    A0 poles cancel from the reference-to-output transfer function.
     # ------------------------------------------------------------
     B1 = np.polyval(B, 1)
-    Acl1 = np.polyval(A_cl, 1)
+    Am1 = np.polyval(A_m, 1)
 
-    if np.isclose(Acl1, 0.0, atol=1e-8):
+    if np.isclose(Am1, 0.0, atol=1e-8):
         warnings.warn(
-            "Desired closed-loop denominator A_cl contains a pole at z=1. "
-            "A finite DC gain cannot be enforced. Using constant T=1 to preserve the "
-            "reference path and keep the denominator matching behavior."
+            "A_cl has a root at z=1; unity DC gain cannot be enforced. Using T = A0.",
+            UserWarning
         )
-        T_coeffs = np.array([1.0])
+        T_coeffs = A0.copy()
     else:
-        t0 = Acl1 / B1
-        T_coeffs = np.array([t0])
+        t0 = Am1 / B1
+        T_coeffs = t0 * A0
 
     # ------------------------------------------------------------
-    # 5. Transfer functions 
+    # 7. Transfer functions
     # ------------------------------------------------------------
     S_tf = ct.tf(S_coeffs, [1], plant_discrete_tf.dt)
     R_tf = ct.tf(R_coeffs, [1], plant_discrete_tf.dt)
     T_tf = ct.tf(T_coeffs, [1], plant_discrete_tf.dt)
 
     # ------------------------------------------------------------
-    # 6. Verification 
+    # 8. Verification
+    # Use A_cl_total directly for den_cl: avoids spurious leading-coefficient
+    # noise from algebraic cancellation of high-degree terms in A*S + B*R.
     # ------------------------------------------------------------
-
-    num_cl = np.polymul(B, T_coeffs) # =B_cl
-    den_cl = np.polyadd(np.polymul(A, S_coeffs), np.polymul(B, R_coeffs)) #=A_cl
-
+    num_cl = np.polymul(B, T_coeffs)
+    den_cl = A_cl_total   # == A_m * A0 by construction
     H_cl = ct.tf(num_cl, den_cl, plant_discrete_tf.dt)
 
     print("\n--- RST synthesis complete ---")
@@ -252,197 +251,184 @@ def Compute_Denominator_Matching_RST(A_cl: list, plant_discrete_tf, Integrator=T
     print("Denominator coefficients:", den_cl)
     print(H_cl)
     if np.isclose(np.polyval(den_cl, 1.0), 0.0, atol=1e-8):
-        print(
-            "Closed-loop DC gain: undefined or infinite because the closed-loop denominator "
-            "has a pole at z=1."
-        )
+        print("Closed-loop DC gain: undefined (pole at z=1)")
     else:
         print("Closed-loop DC gain:", ct.dcgain(H_cl))
-    print("Poles of the closed loop transfer function")
-    print("z poles:", np.roots(H_cl.den_list[0][0]))
-    print("radius:", np.abs(np.roots(H_cl.den_list[0][0])))
-    return S_tf, R_tf, T_tf,H_cl
+    print("Closed-loop poles (z):", np.roots(H_cl.den_list[0][0]))
+    print("Pole radii:           ", np.abs(np.roots(H_cl.den_list[0][0])))
+    return S_tf, R_tf, T_tf, H_cl
+
+
 def Compute_Desired_RST(Desired_TF, plant_discrete_tf, Integrator=True, A0=None):
     """RST synthesis from a fully specified desired closed-loop transfer function.
 
-    Computes S, R, T such that the closed-loop transfer function of the RST-controlled
-    plant equals ``Desired_TF`` (both numerator and denominator matched).  The control
-    law is:
-        v[k] = T·r[k] − R·y[k]
-        u[k] = (1/S) · v[k]
+    Computes S, R, T using the Landau observer polynomial formulation.  The algorithm:
 
-    The desired numerator B_cl must be exactly divisible by the plant numerator B; if not,
-    a ``ValueError`` is raised.  This is automatically satisfied when ``Desired_TF`` is
-    constructed by ``Place_real_radius`` (which builds B_cl as a scalar multiple of B).
+      1. Solve the *reduced* Diophantine for S', R':
+             A_eff(z) · S'(z) + B(z) · R'(z) = A_m(z)
+         where A_m = Desired_TF.den and A_eff = A*(z-1) when Integrator=True.
 
-    Use ``Compute_Denominator_Matching_RST`` instead if you only want to prescribe the
-    closed-loop poles without specifying the numerator.
+      2. Apply the observer polynomial factor:
+             S = A0 · S',   R = A0 · R',   T = A0 · T'   (T' = B_cl / B)
+         so that:
+             H_cl = B·T / (A·S + B·R) = B·(A0·T') / (A_m·A0) = B·T' / A_m
+                  = B·(B_cl/B) / A_m = B_cl / A_m = Desired_TF
+         The A0 poles cancel exactly from the closed-loop reference-to-output path.
 
-    Hardcoded values
-    ----------------
-    INT = [1, −1]
-        Same integrator augmentation as ``Compute_Denominator_Matching_RST``.
-    Exact polynomial division (``np.polydiv``)
-        T is recovered from  B·T = B_cl  via exact polynomial long division.  A non-zero
-        remainder means the desired numerator is not achievable with the given plant model.
-    Tolerance 1e-8
-        Residuals below this threshold in the Diophantine check and in the polynomial
-        division remainder are treated as numerical noise.
+    Degree constraint
+    -----------------
+    ``Desired_TF.den`` (the dominant polynomial A_m) must satisfy:
+        deg(A_m) ≤ deg(A) + deg(B)
+    A0 may have any degree; it does not consume this budget.
 
     Args:
-        Desired_TF (ct.TransferFunction): Fully specified desired closed-loop discrete
-            transfer function B_cl(z) / A_cl(z).  Typically produced by ``Place_real_radius``.
+        Desired_TF (ct.TransferFunction): Desired closed-loop TF B_cl(z) / A_m(z)
+            *without* the observer polynomial.  The denominator specifies dominant poles;
+            A0 is appended separately.  The numerator B_cl must be exactly divisible by B.
         plant_discrete_tf (ct.TransferFunction): Discrete plant transfer function B(z)/A(z).
-        Integrator (bool, optional): If True, forces S to contain the factor (z−1) to
-            guarantee zero steady-state error for step references.  Defaults to True.
-        A0 (array-like or None, optional): Observer polynomial; its roots are additional
-            closed-loop poles appended to the denominator of ``Desired_TF``.
-            Pass None for no observer poles.  Defaults to None.
+        Integrator (bool, optional): If True, forces S to contain (z-1).  Defaults to True.
+        A0 (array-like or None, optional): Observer polynomial; roots are additional
+            closed-loop poles that cancel from H_cl.  Pass None for no observer poles.
 
     Returns:
         tuple:
-            S_tf (ct.TransferFunction): S polynomial as a discrete TF with denominator 1.
-            R_tf (ct.TransferFunction): R polynomial as a discrete TF with denominator 1.
-            T_tf (ct.TransferFunction): T polynomial as a discrete TF with denominator 1.
-            H_cl (ct.TransferFunction): Closed-loop transfer function B·T / (A·S + B·R)
-                computed for verification.
+            S_tf, R_tf, T_tf (ct.TransferFunction): Polynomial TFs with denominator 1.
+            H_cl (ct.TransferFunction): Verified closed-loop TF ≈ Desired_TF.
 
     Raises:
-        ValueError: If the Diophantine equation cannot be satisfied, if ``A_cl * A0``
-            contains unstable poles, or if ``B_cl`` is not exactly divisible by ``B``.
+        ValueError: If degree constraint violated, A_m * A0 has unstable poles, or
+            B_cl is not exactly divisible by B.
     """
-
     # ------------------------------------------------------------
-    # 1. Extract polynomials
+    # 1. Extract and normalise polynomials
     # ------------------------------------------------------------
     A = trim(plant_discrete_tf.den[0][0])
     B = trim(plant_discrete_tf.num[0][0])
+    A_m_raw = trim(Desired_TF.den[0][0])
+    B_cl_raw = trim(Desired_TF.num[0][0])
 
-    A_cl_original = trim(Desired_TF.den[0][0])
-    B_cl = trim(Desired_TF.num[0][0])
+    # Normalise: make A monic and scale B proportionally to preserve B/A
+    a_lead = A[0]
+    A = A / a_lead
+    B = B / a_lead
 
-    # Normalize the polyomials
-    A = A / A[0]
-    B = B / A[0]
-    A_cl_original = A_cl_original / A_cl_original[0]
-    B_cl = B_cl / A_cl_original[0]
+    # Normalise desired denominator and scale B_cl proportionally to preserve B_cl/A_m
+    m_lead = A_m_raw[0]
+    A_m = A_m_raw / m_lead
+    B_cl = B_cl_raw / m_lead
 
     A0 = trim(np.asarray(A0 if A0 is not None else [1.0], dtype=float))
     A0 = A0 / A0[0]
 
-    # Total desired denominator: dominant poles * observer polynomial
-    A_cl = trim(np.convolve(A_cl_original, A0))
+    # Total desired characteristic polynomial: A_m * A0
+    A_cl_total = trim(np.convolve(A_m, A0))
 
     deg_A = len(A) - 1
     deg_B = len(B) - 1
 
     INT = np.array([1.0, -1.0])
+
     # ============================================================================
-    # 2. Choose controller structure orders
-    # ============================================================================
-    # Same degree selection as Compute_Denominator_Matching_RST.
-    # Goal: A*S + B*R = A_cl * A0  (total desired denominator includes observer poles).
-    # See Compute_Denominator_Matching_RST for the full degree-counting argument.
+    # 2. Controller structure orders (same logic as Compute_Denominator_Matching_RST)
     # ============================================================================
     if Integrator:
-        deg_S = deg_B - 1
+        deg_S_tilde = deg_B - 1
     else:
-        deg_S = deg_B
+        deg_S_tilde = deg_B
     deg_R = deg_A
-    nS = max(deg_S + 1, 1)
+    nS = max(deg_S_tilde + 1, 1)
     nR = deg_R + 1
 
     # ============================================================================
-    # 3. Build Diophantine equation:
-    #       A(z)*S(z) + B(z)*R(z) = A_cl(z) * A0(z)
-    #
-    # Integrator case: A_eff = A*(z-1), solves for S_tilde, then S = (z-1)*S_tilde.
+    # 3. Build reduced Diophantine:  A_eff · S_tilde' + B · R' = A_m
     # ============================================================================
     if Integrator:
         AS = conv_matrix(np.convolve(A, INT), nS)
     else:
         AS = conv_matrix(A, nS)
-    
+
     BR = conv_matrix(B, nR)
+    M = np.hstack([AS, BR])
 
-    M = np.hstack([AS, BR]) # stacking horizontally the AS and BR toeplitz matrices forming the M matrix 
-
-    # Desired denominator must fit the R/S structure and remain stable for a bounded step response.
     target_len = M.shape[0]
-    if len(A_cl) > target_len:
+    if len(A_m) > target_len:
         raise ValueError(
-            "Desired closed-loop denominator A_cl is too high order for the chosen R/S structure. "
-            "Use a lower-order desired TF or increase controller order."
+            f"Desired denominator A_m (degree {len(A_m) - 1}) exceeds the system capacity "
+            f"(max degree {target_len - 1}). Reduce the desired TF denominator degree. "
+            "A0 observer poles do not consume this budget."
         )
-    A_cl = np.r_[A_cl, np.zeros(target_len - len(A_cl))]
+    A_m_padded = np.r_[np.zeros(target_len - len(A_m)), A_m]
 
-    poles = np.roots(A_cl)
-    if np.any(np.abs(poles) >= 1.0 - 1e-8):
+    # Stability check on total polynomial
+    poles_total = np.roots(A_cl_total)
+    if np.any(np.abs(poles_total) >= 1.0 - 1e-8):
         raise ValueError(
-            "Desired closed-loop denominator A_cl * A0 must have all poles strictly inside "
-            "the unit circle for a bounded discrete step response."
+            "A_m * A0 must have all poles strictly inside the unit circle "
+            "for a bounded discrete step response."
         )
 
-    # Solve
-    theta, *_ = np.linalg.lstsq(M, A_cl, rcond=None)
-    # via the least squares method, this gives the most exact approximate solution 
+    # ------------------------------------------------------------
+    # 4. Solve reduced Diophantine for S_tilde', R'
+    # ------------------------------------------------------------
+    theta, *_ = np.linalg.lstsq(M, A_m_padded, rcond=None)
+    S_tilde_prime = theta[:nS]
+    R_prime = theta[nS:]
 
-    S_tilde = theta[:nS] # extracting the first coeficients into S
-    R_coeffs = theta[nS:] # and the remaining into R
     if Integrator:
-        S_coeffs = np.convolve(S_tilde, INT)
+        S_prime = np.convolve(S_tilde_prime, INT)
     else:
-        S_coeffs = S_tilde
+        S_prime = S_tilde_prime
 
-    # Verify denominator matching for sanity: A*S + B*R = A_cl * A0
+    # ------------------------------------------------------------
+    # 5. Observer polynomial factorisation:  S = A0 · S',  R = A0 · R'
+    # ------------------------------------------------------------
+    S_coeffs = np.convolve(A0, S_prime)
+    R_coeffs = np.convolve(A0, R_prime)
+
+    # Verify Diophantine: A*S + B*R = A_cl_total
     den_check = np.polyadd(np.polymul(A, S_coeffs), np.polymul(B, R_coeffs))
-    A_cl_check = A_cl.copy()
-    if len(den_check) < len(A_cl_check):
-        den_check = np.r_[np.zeros(len(A_cl_check) - len(den_check)), den_check]
-    elif len(A_cl_check) < len(den_check):
-        A_cl_check = np.r_[np.zeros(len(den_check) - len(A_cl_check)), A_cl_check]
-
-    if not np.allclose(den_check, A_cl_check, atol=1e-8):
+    A_cl_v = A_cl_total.copy()
+    pad = max(len(den_check), len(A_cl_v))
+    den_check_p = np.r_[np.zeros(pad - len(den_check)), den_check]
+    A_cl_v_p = np.r_[np.zeros(pad - len(A_cl_v)), A_cl_v]
+    if not np.allclose(den_check_p, A_cl_v_p, atol=1e-8):
         raise ValueError(
-            "RST denominator synthesis failed: A*S + B*R does not equal desired A_cl * A0."
+            "RST synthesis failed: A*S + B*R does not equal A_m * A0. "
+            "Check plant conditioning or degree constraints."
         )
 
     # ------------------------------------------------------------
-    # 4. Compute T correctly from:
-    #       B T = B_cl
+    # 6. Compute T = A0 · T'  where  T' = B_cl / B
+    #
+    #    H_cl = B·T / (A·S + B·R) = B·(A0·T') / (A_m·A0) = B·T'/A_m = B_cl/A_m
+    #    A0 poles cancel from the closed-loop reference-to-output path.
     # ------------------------------------------------------------
-    nT = max(1, len(B_cl) - len(B) + 1) #computes the lengh of the T vector comes from B T = B_cl, but cannot be negative 
-
-    # Use exact polynomial division if possible
-    quotient, remainder = np.polydiv(B_cl, B) ## compute T=B\Bcl
-    remainder = np.trim_zeros(np.round(remainder, decimals=12), 'f') # cleaning off numerical noise and trimming zeros
-    if len(remainder) == 0 or np.allclose(remainder, 0, atol=1e-8): # if the solution is exact, the remainder is almost zero
-        T_coeffs = np.trim_zeros(quotient, 'f')
-        if len(T_coeffs) == 0:  ## if the quotient is zero 
-            T_coeffs = np.array([0.0]) ## add a zero 
-        if len(T_coeffs) < nT:
-            T_coeffs = np.r_[T_coeffs, np.zeros(nT - len(T_coeffs))]
-    else: ## if the tolerance is not not exact we raise an error or we cannot divide B by B_cl
+    quotient, remainder = np.polydiv(B_cl, B)
+    remainder = np.trim_zeros(np.round(remainder, decimals=12), 'f')
+    if len(remainder) > 0 and not np.allclose(remainder, 0, atol=1e-8):
         raise ValueError(
-            "Desired numerator is not achievable with B * T; adjust the desired transfer function or use a different plant model."
+            "Desired numerator B_cl is not exactly divisible by B. "
+            "Adjust the desired transfer function or use a different plant model."
         )
+    T_prime = np.trim_zeros(quotient, 'f')
+    if len(T_prime) == 0:
+        T_prime = np.array([0.0])
+    T_coeffs = np.convolve(A0, T_prime)
 
-    # If the polynomial division returns higher-order coefficients, keep the full result.
-    nT = len(T_coeffs)
     # ------------------------------------------------------------
-    # 5. Transfer functions 
+    # 7. Transfer functions
     # ------------------------------------------------------------
     S_tf = ct.tf(S_coeffs, [1], plant_discrete_tf.dt)
     R_tf = ct.tf(R_coeffs, [1], plant_discrete_tf.dt)
     T_tf = ct.tf(T_coeffs, [1], plant_discrete_tf.dt)
 
     # ------------------------------------------------------------
-    # 6. Verification 
+    # 8. Verification
+    # Use A_cl_total directly for den_cl: avoids spurious leading-coefficient
+    # noise from algebraic cancellation of high-degree terms in A*S + B*R.
     # ------------------------------------------------------------
-
-    num_cl = np.polymul(B, T_coeffs) # =B_cl
-    den_cl = np.polyadd(np.polymul(A, S_coeffs), np.polymul(B, R_coeffs)) #=A_cl
-
+    num_cl = np.polymul(B, T_coeffs)
+    den_cl = A_cl_total   # == A_m * A0 by construction
     H_cl = ct.tf(num_cl, den_cl, plant_discrete_tf.dt)
 
     print("\n--- RST synthesis complete ---")
@@ -451,8 +437,7 @@ def Compute_Desired_RST(Desired_TF, plant_discrete_tf, Integrator=True, A0=None)
     print("T:", T_coeffs)
     print("\nClosed-loop TF check:")
     print(H_cl)
-    print(ct.dcgain(H_cl))
-    print("Poles of the closed loop transfer function")
-    print("z poles:", np.roots(H_cl.den_list[0][0]))
-    print("radius:", np.abs(np.roots(H_cl.den_list[0][0])))
-    return S_tf, R_tf, T_tf,H_cl
+    print("DC gain:", ct.dcgain(H_cl))
+    print("Closed-loop poles (z):", np.roots(H_cl.den_list[0][0]))
+    print("Pole radii:           ", np.abs(np.roots(H_cl.den_list[0][0])))
+    return S_tf, R_tf, T_tf, H_cl
