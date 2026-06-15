@@ -16,13 +16,11 @@
     <nav class="pdoc">
         <label id="navtoggle" for="togglestate" class="pdoc-button"><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke-linecap='round' stroke="currentColor" stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg></label>
         <input id="togglestate" type="checkbox" aria-hidden="true" tabindex="-1">
-        <div>            <a class="pdoc-button module-list-button" href="../index.html">
+        <div>            <a class="pdoc-button module-list-button" href="../Metrics_Plotting.html">
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-in-left" viewBox="0 0 16 16">
   <path fill-rule="evenodd" d="M10 3.5a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 1 1 0v2A1.5 1.5 0 0 1 9.5 14h-8A1.5 1.5 0 0 1 0 12.5v-9A1.5 1.5 0 0 1 1.5 2h8A1.5 1.5 0 0 1 11 3.5v2a.5.5 0 0 1-1 0v-2z"/>
   <path fill-rule="evenodd" d="M4.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H14.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3z"/>
-</svg>                &nbsp;
-                Module Index
-            </a>
+</svg>                &nbsp;Metrics_Plotting</a>
 
 
             <input type="search" placeholder="Search..." role="searchbox" aria-label="search"
@@ -67,17 +65,17 @@
     <main class="pdoc">
             <section class="module-info">
                     <h1 class="modulename">
-Metrics_Plotting<wbr>.SimLog    </h1>
+<a href="./../Metrics_Plotting.html">Metrics_Plotting</a><wbr>.SimLog    </h1>
 
                 
                         <input id="mod-SimLog-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 
                         <label class="view-source-button" for="mod-SimLog-view-source"><span>View Source</span></label>
 
-                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a>
 </span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a>
-</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="k">class</span><span class="w"> </span><span class="nc">SimLog</span><span class="p">:</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="k">class</span> <span class="nc">SimLog</span><span class="p">:</span>
 </span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Accumulates time, output, and input samples from a simulation run.</span>
 </span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a>
 </span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="sd">    Each call to ``log`` appends one sample.  After the simulation, ``t_hist``,</span>
@@ -85,13 +83,13 @@ Metrics_Plotting<wbr>.SimLog    </h1>
 </span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="sd">    ready for plotting or export.</span>
 </span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates empty lists to accumulate the simulation trajectory.&quot;&quot;&quot;</span>
 </span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">t_hist</span> <span class="o">=</span> <span class="p">[]</span>
 </span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">y_hist</span> <span class="o">=</span> <span class="p">[]</span>
 </span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">u_hist</span> <span class="o">=</span> <span class="p">[]</span>
 </span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>
-</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">u</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">u</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
 </span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Appends one time step to the trajectory.</span>
 </span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>
 </span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a><span class="sd">        Both ``y`` and ``u`` are expected to be single-element arrays; ``.item()``</span>
@@ -121,7 +119,7 @@ Metrics_Plotting<wbr>.SimLog    </h1>
 
     </div>
     <a class="headerlink" href="#SimLog"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="SimLog-5"><a href="#SimLog-5"><span class="linenos"> 5</span></a><span class="k">class</span><span class="w"> </span><span class="nc">SimLog</span><span class="p">:</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="SimLog-5"><a href="#SimLog-5"><span class="linenos"> 5</span></a><span class="k">class</span> <span class="nc">SimLog</span><span class="p">:</span>
 </span><span id="SimLog-6"><a href="#SimLog-6"><span class="linenos"> 6</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Accumulates time, output, and input samples from a simulation run.</span>
 </span><span id="SimLog-7"><a href="#SimLog-7"><span class="linenos"> 7</span></a>
 </span><span id="SimLog-8"><a href="#SimLog-8"><span class="linenos"> 8</span></a><span class="sd">    Each call to ``log`` appends one sample.  After the simulation, ``t_hist``,</span>
@@ -129,13 +127,13 @@ Metrics_Plotting<wbr>.SimLog    </h1>
 </span><span id="SimLog-10"><a href="#SimLog-10"><span class="linenos">10</span></a><span class="sd">    ready for plotting or export.</span>
 </span><span id="SimLog-11"><a href="#SimLog-11"><span class="linenos">11</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="SimLog-12"><a href="#SimLog-12"><span class="linenos">12</span></a>
-</span><span id="SimLog-13"><a href="#SimLog-13"><span class="linenos">13</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="SimLog-13"><a href="#SimLog-13"><span class="linenos">13</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="SimLog-14"><a href="#SimLog-14"><span class="linenos">14</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates empty lists to accumulate the simulation trajectory.&quot;&quot;&quot;</span>
 </span><span id="SimLog-15"><a href="#SimLog-15"><span class="linenos">15</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">t_hist</span> <span class="o">=</span> <span class="p">[]</span>
 </span><span id="SimLog-16"><a href="#SimLog-16"><span class="linenos">16</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">y_hist</span> <span class="o">=</span> <span class="p">[]</span>
 </span><span id="SimLog-17"><a href="#SimLog-17"><span class="linenos">17</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">u_hist</span> <span class="o">=</span> <span class="p">[]</span>
 </span><span id="SimLog-18"><a href="#SimLog-18"><span class="linenos">18</span></a>
-</span><span id="SimLog-19"><a href="#SimLog-19"><span class="linenos">19</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">u</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+</span><span id="SimLog-19"><a href="#SimLog-19"><span class="linenos">19</span></a>    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">u</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
 </span><span id="SimLog-20"><a href="#SimLog-20"><span class="linenos">20</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Appends one time step to the trajectory.</span>
 </span><span id="SimLog-21"><a href="#SimLog-21"><span class="linenos">21</span></a>
 </span><span id="SimLog-22"><a href="#SimLog-22"><span class="linenos">22</span></a><span class="sd">        Both ``y`` and ``u`` are expected to be single-element arrays; ``.item()``</span>
@@ -171,7 +169,7 @@ ready for plotting or export.</p>
 
     </div>
     <a class="headerlink" href="#SimLog.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="SimLog.__init__-13"><a href="#SimLog.__init__-13"><span class="linenos">13</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="SimLog.__init__-13"><a href="#SimLog.__init__-13"><span class="linenos">13</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="SimLog.__init__-14"><a href="#SimLog.__init__-14"><span class="linenos">14</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates empty lists to accumulate the simulation trajectory.&quot;&quot;&quot;</span>
 </span><span id="SimLog.__init__-15"><a href="#SimLog.__init__-15"><span class="linenos">15</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">t_hist</span> <span class="o">=</span> <span class="p">[]</span>
 </span><span id="SimLog.__init__-16"><a href="#SimLog.__init__-16"><span class="linenos">16</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">y_hist</span> <span class="o">=</span> <span class="p">[]</span>
@@ -228,7 +226,7 @@ ready for plotting or export.</p>
 
     </div>
     <a class="headerlink" href="#SimLog.log"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="SimLog.log-19"><a href="#SimLog.log-19"><span class="linenos">19</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">u</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="SimLog.log-19"><a href="#SimLog.log-19"><span class="linenos">19</span></a>    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">u</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
 </span><span id="SimLog.log-20"><a href="#SimLog.log-20"><span class="linenos">20</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Appends one time step to the trajectory.</span>
 </span><span id="SimLog.log-21"><a href="#SimLog.log-21"><span class="linenos">21</span></a>
 </span><span id="SimLog.log-22"><a href="#SimLog.log-22"><span class="linenos">22</span></a><span class="sd">        Both ``y`` and ``u`` are expected to be single-element arrays; ``.item()``</span>

@@ -90,13 +90,13 @@
 
                         <label class="view-source-button" for="mod-RSTController-view-source"><span>View Source</span></label>
 
-                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-</span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">control</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ct</span>
+                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="kn">import</span> <span class="nn">control</span> <span class="k">as</span> <span class="nn">ct</span>
 </span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a>
-</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">Simulation.simulation</span><span class="w"> </span><span class="kn">import</span> <span class="n">TFSimulator</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="kn">from</span> <span class="nn">Simulation.simulation</span> <span class="kn">import</span> <span class="n">TFSimulator</span>
 </span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a>
 </span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a>
-</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="k">class</span><span class="w"> </span><span class="nc">RSTController</span><span class="p">:</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="k">class</span> <span class="nc">RSTController</span><span class="p">:</span>
 </span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Polynomial RST controller implementing the two-degree-of-freedom control law:</span>
 </span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>
 </span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="sd">        S(z) · u[k] = T(z) · r[k] − R(z) · y[k]</span>
@@ -110,7 +110,7 @@
 </span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a><span class="sd">    the other.</span>
 </span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>
-</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">R</span><span class="p">:</span> <span class="n">ct</span><span class="o">.</span><span class="n">TransferFunction</span><span class="p">,</span> <span class="n">S</span><span class="p">:</span> <span class="n">ct</span><span class="o">.</span><span class="n">TransferFunction</span><span class="p">,</span> <span class="n">T</span><span class="p">:</span> <span class="n">ct</span><span class="o">.</span><span class="n">TransferFunction</span><span class="p">):</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">R</span><span class="p">:</span> <span class="n">ct</span><span class="o">.</span><span class="n">TransferFunction</span><span class="p">,</span> <span class="n">S</span><span class="p">:</span> <span class="n">ct</span><span class="o">.</span><span class="n">TransferFunction</span><span class="p">,</span> <span class="n">T</span><span class="p">:</span> <span class="n">ct</span><span class="o">.</span><span class="n">TransferFunction</span><span class="p">):</span>
 </span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialises the RST controller from three polynomial transfer functions.</span>
 </span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>
 </span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a><span class="sd">        The polynomials are typically computed by ``Compute_Desired_RST`` or</span>
@@ -135,7 +135,7 @@
 </span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a>
 </span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">reference</span> <span class="o">=</span> <span class="mf">0.0</span>
 </span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a>
-</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resets the controller&#39;s internal state to zero.</span>
 </span><span id="L-48"><a href="#L-48"><span class="linenos">48</span></a>
 </span><span id="L-49"><a href="#L-49"><span class="linenos">49</span></a><span class="sd">        Clears the reference history, output history, and the 1/S recursive filter state.</span>
@@ -145,7 +145,7 @@
 </span><span id="L-53"><a href="#L-53"><span class="linenos">53</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">y_hist</span><span class="p">[:]</span> <span class="o">=</span> <span class="mf">0.0</span>
 </span><span id="L-54"><a href="#L-54"><span class="linenos">54</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">S_block_sim</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </span><span id="L-55"><a href="#L-55"><span class="linenos">55</span></a>
-</span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">setReference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
+</span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a>    <span class="k">def</span> <span class="nf">setReference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
 </span><span id="L-57"><a href="#L-57"><span class="linenos">57</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the reference setpoint for the controller.</span>
 </span><span id="L-58"><a href="#L-58"><span class="linenos">58</span></a>
 </span><span id="L-59"><a href="#L-59"><span class="linenos">59</span></a><span class="sd">        Args:</span>
@@ -153,7 +153,7 @@
 </span><span id="L-61"><a href="#L-61"><span class="linenos">61</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-62"><a href="#L-62"><span class="linenos">62</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">reference</span> <span class="o">=</span> <span class="n">r</span>
 </span><span id="L-63"><a href="#L-63"><span class="linenos">63</span></a>
-</span><span id="L-64"><a href="#L-64"><span class="linenos">64</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+</span><span id="L-64"><a href="#L-64"><span class="linenos">64</span></a>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
 </span><span id="L-65"><a href="#L-65"><span class="linenos">65</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Computes the control output u[k] for the current plant measurement y[k].</span>
 </span><span id="L-66"><a href="#L-66"><span class="linenos">66</span></a>
 </span><span id="L-67"><a href="#L-67"><span class="linenos">67</span></a><span class="sd">        Implements one step of the RST control law:</span>
@@ -193,7 +193,7 @@
 
     </div>
     <a class="headerlink" href="#RSTController"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="RSTController-8"><a href="#RSTController-8"><span class="linenos"> 8</span></a><span class="k">class</span><span class="w"> </span><span class="nc">RSTController</span><span class="p">:</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="RSTController-8"><a href="#RSTController-8"><span class="linenos"> 8</span></a><span class="k">class</span> <span class="nc">RSTController</span><span class="p">:</span>
 </span><span id="RSTController-9"><a href="#RSTController-9"><span class="linenos"> 9</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Polynomial RST controller implementing the two-degree-of-freedom control law:</span>
 </span><span id="RSTController-10"><a href="#RSTController-10"><span class="linenos">10</span></a>
 </span><span id="RSTController-11"><a href="#RSTController-11"><span class="linenos">11</span></a><span class="sd">        S(z) · u[k] = T(z) · r[k] − R(z) · y[k]</span>
@@ -207,7 +207,7 @@
 </span><span id="RSTController-19"><a href="#RSTController-19"><span class="linenos">19</span></a><span class="sd">    the other.</span>
 </span><span id="RSTController-20"><a href="#RSTController-20"><span class="linenos">20</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="RSTController-21"><a href="#RSTController-21"><span class="linenos">21</span></a>
-</span><span id="RSTController-22"><a href="#RSTController-22"><span class="linenos">22</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">R</span><span class="p">:</span> <span class="n">ct</span><span class="o">.</span><span class="n">TransferFunction</span><span class="p">,</span> <span class="n">S</span><span class="p">:</span> <span class="n">ct</span><span class="o">.</span><span class="n">TransferFunction</span><span class="p">,</span> <span class="n">T</span><span class="p">:</span> <span class="n">ct</span><span class="o">.</span><span class="n">TransferFunction</span><span class="p">):</span>
+</span><span id="RSTController-22"><a href="#RSTController-22"><span class="linenos">22</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">R</span><span class="p">:</span> <span class="n">ct</span><span class="o">.</span><span class="n">TransferFunction</span><span class="p">,</span> <span class="n">S</span><span class="p">:</span> <span class="n">ct</span><span class="o">.</span><span class="n">TransferFunction</span><span class="p">,</span> <span class="n">T</span><span class="p">:</span> <span class="n">ct</span><span class="o">.</span><span class="n">TransferFunction</span><span class="p">):</span>
 </span><span id="RSTController-23"><a href="#RSTController-23"><span class="linenos">23</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialises the RST controller from three polynomial transfer functions.</span>
 </span><span id="RSTController-24"><a href="#RSTController-24"><span class="linenos">24</span></a>
 </span><span id="RSTController-25"><a href="#RSTController-25"><span class="linenos">25</span></a><span class="sd">        The polynomials are typically computed by ``Compute_Desired_RST`` or</span>
@@ -232,7 +232,7 @@
 </span><span id="RSTController-44"><a href="#RSTController-44"><span class="linenos">44</span></a>
 </span><span id="RSTController-45"><a href="#RSTController-45"><span class="linenos">45</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">reference</span> <span class="o">=</span> <span class="mf">0.0</span>
 </span><span id="RSTController-46"><a href="#RSTController-46"><span class="linenos">46</span></a>
-</span><span id="RSTController-47"><a href="#RSTController-47"><span class="linenos">47</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="RSTController-47"><a href="#RSTController-47"><span class="linenos">47</span></a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="RSTController-48"><a href="#RSTController-48"><span class="linenos">48</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resets the controller&#39;s internal state to zero.</span>
 </span><span id="RSTController-49"><a href="#RSTController-49"><span class="linenos">49</span></a>
 </span><span id="RSTController-50"><a href="#RSTController-50"><span class="linenos">50</span></a><span class="sd">        Clears the reference history, output history, and the 1/S recursive filter state.</span>
@@ -242,7 +242,7 @@
 </span><span id="RSTController-54"><a href="#RSTController-54"><span class="linenos">54</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">y_hist</span><span class="p">[:]</span> <span class="o">=</span> <span class="mf">0.0</span>
 </span><span id="RSTController-55"><a href="#RSTController-55"><span class="linenos">55</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">S_block_sim</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </span><span id="RSTController-56"><a href="#RSTController-56"><span class="linenos">56</span></a>
-</span><span id="RSTController-57"><a href="#RSTController-57"><span class="linenos">57</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">setReference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
+</span><span id="RSTController-57"><a href="#RSTController-57"><span class="linenos">57</span></a>    <span class="k">def</span> <span class="nf">setReference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
 </span><span id="RSTController-58"><a href="#RSTController-58"><span class="linenos">58</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the reference setpoint for the controller.</span>
 </span><span id="RSTController-59"><a href="#RSTController-59"><span class="linenos">59</span></a>
 </span><span id="RSTController-60"><a href="#RSTController-60"><span class="linenos">60</span></a><span class="sd">        Args:</span>
@@ -250,7 +250,7 @@
 </span><span id="RSTController-62"><a href="#RSTController-62"><span class="linenos">62</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="RSTController-63"><a href="#RSTController-63"><span class="linenos">63</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">reference</span> <span class="o">=</span> <span class="n">r</span>
 </span><span id="RSTController-64"><a href="#RSTController-64"><span class="linenos">64</span></a>
-</span><span id="RSTController-65"><a href="#RSTController-65"><span class="linenos">65</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+</span><span id="RSTController-65"><a href="#RSTController-65"><span class="linenos">65</span></a>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
 </span><span id="RSTController-66"><a href="#RSTController-66"><span class="linenos">66</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Computes the control output u[k] for the current plant measurement y[k].</span>
 </span><span id="RSTController-67"><a href="#RSTController-67"><span class="linenos">67</span></a>
 </span><span id="RSTController-68"><a href="#RSTController-68"><span class="linenos">68</span></a><span class="sd">        Implements one step of the RST control law:</span>
@@ -303,7 +303,7 @@ the other.</p>
 
     </div>
     <a class="headerlink" href="#RSTController.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="RSTController.__init__-22"><a href="#RSTController.__init__-22"><span class="linenos">22</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">R</span><span class="p">:</span> <span class="n">ct</span><span class="o">.</span><span class="n">TransferFunction</span><span class="p">,</span> <span class="n">S</span><span class="p">:</span> <span class="n">ct</span><span class="o">.</span><span class="n">TransferFunction</span><span class="p">,</span> <span class="n">T</span><span class="p">:</span> <span class="n">ct</span><span class="o">.</span><span class="n">TransferFunction</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="RSTController.__init__-22"><a href="#RSTController.__init__-22"><span class="linenos">22</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">R</span><span class="p">:</span> <span class="n">ct</span><span class="o">.</span><span class="n">TransferFunction</span><span class="p">,</span> <span class="n">S</span><span class="p">:</span> <span class="n">ct</span><span class="o">.</span><span class="n">TransferFunction</span><span class="p">,</span> <span class="n">T</span><span class="p">:</span> <span class="n">ct</span><span class="o">.</span><span class="n">TransferFunction</span><span class="p">):</span>
 </span><span id="RSTController.__init__-23"><a href="#RSTController.__init__-23"><span class="linenos">23</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialises the RST controller from three polynomial transfer functions.</span>
 </span><span id="RSTController.__init__-24"><a href="#RSTController.__init__-24"><span class="linenos">24</span></a>
 </span><span id="RSTController.__init__-25"><a href="#RSTController.__init__-25"><span class="linenos">25</span></a><span class="sd">        The polynomials are typically computed by ``Compute_Desired_RST`` or</span>
@@ -432,7 +432,7 @@ the other.</p>
 
     </div>
     <a class="headerlink" href="#RSTController.reset"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="RSTController.reset-47"><a href="#RSTController.reset-47"><span class="linenos">47</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="RSTController.reset-47"><a href="#RSTController.reset-47"><span class="linenos">47</span></a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="RSTController.reset-48"><a href="#RSTController.reset-48"><span class="linenos">48</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resets the controller&#39;s internal state to zero.</span>
 </span><span id="RSTController.reset-49"><a href="#RSTController.reset-49"><span class="linenos">49</span></a>
 </span><span id="RSTController.reset-50"><a href="#RSTController.reset-50"><span class="linenos">50</span></a><span class="sd">        Clears the reference history, output history, and the 1/S recursive filter state.</span>
@@ -463,7 +463,7 @@ Call this before each new simulation run to avoid carry-over from a previous run
 
     </div>
     <a class="headerlink" href="#RSTController.setReference"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="RSTController.setReference-57"><a href="#RSTController.setReference-57"><span class="linenos">57</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">setReference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="RSTController.setReference-57"><a href="#RSTController.setReference-57"><span class="linenos">57</span></a>    <span class="k">def</span> <span class="nf">setReference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
 </span><span id="RSTController.setReference-58"><a href="#RSTController.setReference-58"><span class="linenos">58</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the reference setpoint for the controller.</span>
 </span><span id="RSTController.setReference-59"><a href="#RSTController.setReference-59"><span class="linenos">59</span></a>
 </span><span id="RSTController.setReference-60"><a href="#RSTController.setReference-60"><span class="linenos">60</span></a><span class="sd">        Args:</span>
@@ -492,7 +492,7 @@ Call this before each new simulation run to avoid carry-over from a previous run
 
     </div>
     <a class="headerlink" href="#RSTController.step"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="RSTController.step-65"><a href="#RSTController.step-65"><span class="linenos">65</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="RSTController.step-65"><a href="#RSTController.step-65"><span class="linenos">65</span></a>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
 </span><span id="RSTController.step-66"><a href="#RSTController.step-66"><span class="linenos">66</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Computes the control output u[k] for the current plant measurement y[k].</span>
 </span><span id="RSTController.step-67"><a href="#RSTController.step-67"><span class="linenos">67</span></a>
 </span><span id="RSTController.step-68"><a href="#RSTController.step-68"><span class="linenos">68</span></a><span class="sd">        Implements one step of the RST control law:</span>
