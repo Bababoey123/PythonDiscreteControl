@@ -12,7 +12,3 @@ RST Synthesis and Simulation Cleanup Checklist
 10. Refactor notebook experiments to separate denominator-only vs full transfer function synthesis.
 
 
-python -m pdoc --output-dir docs/pdoc --template-directory docs/pdoc_templates \
-  Control Models.BallBeam.* Simulation.simulation Simulation.runners \
-  Metrics_Plotting.* Utils.utils Utils.computeRST
-  
