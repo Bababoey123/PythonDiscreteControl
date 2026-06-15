@@ -49,27 +49,28 @@ def conv_matrix(a, n):
 def Compute_Denominator_Matching_RST(A_cl: list, plant_discrete_tf, Integrator=True, A0=None):
     """RST synthesis by denominator (characteristic polynomial) matching.
 
-    Computes S, R, T using the Landau observer polynomial formulation.  The algorithm
-    proceeds in two stages:
+    Computes S, R, T by solving the Diophantine equation directly against the full
+    target A_cl_total = A_m * A0, then setting T = t0 * A0.  The algorithm:
 
-      1. Solve the *reduced* Diophantine for S', R' using only the dominant polynomial:
-             A_eff(z) · S'(z) + B(z) · R'(z) = A_m(z)
-         where A_eff = A*(z-1) when Integrator=True.
+      1. Build the full target polynomial A_cl_total = A_m * A0.
+      2. Solve the Diophantine:
+             A_eff(z) · S_tilde(z) + B(z) · R(z) = A_cl_total(z)
+         where A_eff = A*(z-1) when Integrator=True, S = (z-1)*S_tilde.
+      3. Set T = t0 · A0, where t0 = A_m(1)/B(1) enforces unity DC gain.
 
-      2. Apply the observer polynomial factor:
-             S = A0 · S',   R = A0 · R',   T = t0 · A0
-         so that  A·S + B·R = A0·(A·S' + B·R') = A0 · A_m  and A0 cancels from
-         the reference-to-output transfer function:
-             H_ry = B·T / (A·S + B·R) = t0·B / A_m   (A0-poles are invisible to r)
+    The A0 factor in T cancels with the A0 factor in the denominator:
+        H_ry = B·T / (A·S + B·R) = B·(t0·A0) / (A_m·A0) = t0·B / A_m
+    so the reference-to-output dynamics are governed by A_m alone.
 
-    The scalar gain t0 = A_m(1) / B(1) enforces unity DC gain.
+    Solving against the full target (not A_m alone) is critical: a "reduced" solve
+    targeting A_m forces a leading-zero constraint on S_tilde that flips its sign,
+    causing the 1/S filter in the RSTController to drive the plant in the wrong
+    direction and the closed-loop simulation to diverge.
 
     Degree constraint
     -----------------
-    ``A_cl`` (the dominant polynomial, *not* including A0) must satisfy:
-        deg(A_cl) ≤ deg(A) + deg(B)   (non-integrator)
-        deg(A_cl) ≤ deg(A) + deg(B)   (integrator — same bound, exactly determined)
-    A0 may have any degree; it is applied after the Diophantine solve.
+    The total polynomial A_m * A0 must fit in the Diophantine system:
+        deg(A_m) + deg(A0) ≤ deg(A) + deg(B)
 
     Args:
         A_cl (list): Coefficients of the *dominant* closed-loop characteristic
@@ -146,18 +147,13 @@ def Compute_Denominator_Matching_RST(A_cl: list, plant_discrete_tf, Integrator=T
     BR = conv_matrix(B, nR)
     M = np.hstack([AS, BR])
 
-    # Degree constraint applies to the dominant polynomial A_m only
+    # Degree constraint: A_m (dominant polynomial) must fit in the Diophantine system.
     target_len = M.shape[0]
     if len(A_m) > target_len:
         raise ValueError(
             f"Dominant polynomial A_cl (degree {len(A_m) - 1}) exceeds the system capacity "
-            f"(max degree {target_len - 1} for this plant/structure). "
-            "Reduce A_cl degree. Note: A0 observer poles are added separately and do not "
-            "consume this budget."
+            f"(max degree {target_len - 1} for this plant/structure). Reduce A_cl degree."
         )
-    # Prepend leading zeros so the polynomial lives at the correct degree
-    # inside the Toeplitz system (coefficient order: highest power first).
-    A_m_padded = np.r_[np.zeros(target_len - len(A_m)), A_m]
 
     # Stability check on the total characteristic polynomial A_m * A0
     poles_total = np.roots(A_cl_total)
@@ -174,24 +170,69 @@ def Compute_Denominator_Matching_RST(A_cl: list, plant_discrete_tf, Integrator=T
         )
 
     # ------------------------------------------------------------
-    # 4. Solve reduced Diophantine for S_tilde', R'
-    # ------------------------------------------------------------
-    theta, *_ = np.linalg.lstsq(M, A_m_padded, rcond=None)
-    S_tilde_prime = theta[:nS]
-    R_prime = theta[nS:]
-
-    if Integrator:
-        S_prime = np.convolve(S_tilde_prime, INT)   # S' = (z-1) · S_tilde'
-    else:
-        S_prime = S_tilde_prime
-
-    # ------------------------------------------------------------
-    # 5. Observer polynomial factorisation:  S = A0 · S',  R = A0 · R'
+    # Dead-beat fill: if A_cl_total is shorter than target_len, append trailing
+    # zeros (= multiply by z^slack, adding poles at z=0).
     #
-    #    A·S + B·R = A·(A0·S') + B·(A0·R') = A0·(A·S' + B·R') = A0 · A_m = A_cl_total
+    # WHY: padding with LEADING zeros forces the first Diophantine equation to
+    # "s0 + b·r0 = 0", giving s0 < 0 and inverting the 1/S filter sign →
+    # simulation diverges.  TRAILING zeros shift the polynomial left without
+    # touching the leading coefficient, so s0 = 1 - b·r0 > 0 is preserved.
+    #
+    # This situation arises when A_m has lower degree than the system capacity
+    # (e.g. double integrator + Integrator=True + A0=None: capacity degree 3,
+    # A_m degree 2 → slack = 1).  The extra z=0 pole decays in one step and
+    # does not meaningfully affect the transient response.
     # ------------------------------------------------------------
-    S_coeffs = np.convolve(A0, S_prime)
-    R_coeffs = np.convolve(A0, R_prime)
+    slack = target_len - len(A_cl_total)
+    if slack > 0:
+        A_cl_total = np.r_[A_cl_total, np.zeros(slack)]
+        warnings.warn(
+            f"A_m * A0 (degree {len(A_cl_total) - 1 - slack}) is {slack} degree(s) below "
+            f"the Diophantine system capacity (degree {target_len - 1}). "
+            f"{slack} deadbeat pole(s) at z=0 added automatically. "
+            "Pass an explicit A0 to control the placement of these poles.",
+            UserWarning
+        )
+
+    # ------------------------------------------------------------
+    # 4. Solve the Diophantine.
+    #
+    #    Two strategies depending on whether A_cl_total fits in the system:
+    #
+    #    DIRECT (preferred when A_cl_total fits):
+    #      Target = A_cl_total = A_m * A0.  The leading coefficient of the target is
+    #      positive (A_m and A0 are monic), so S_tilde[0] > 0 and S[0] > 0.  A positive
+    #      S[0] is required for the 1/S filter in RSTController to drive the plant in the
+    #      correct direction.  Solving against A_m alone (with a leading-zero pad) forces
+    #      S_tilde[0] < 0, inverts the 1/S gain, and causes the simulation to diverge.
+    #
+    #    TWO-STEP LANDAU (fallback when A_cl_total exceeds the system):
+    #      Target = A_m, then S = A0 * S', R = A0 * R'.  Required when A_m is at the
+    #      system degree limit and A_cl_total would overflow it.  For most non-integrating
+    #      plants A_m exactly fills target_len, ensuring S'[0] > 0.
+    # ------------------------------------------------------------
+    if len(A_cl_total) <= target_len:
+        # Direct solve: A_cl_total fits — target the full polynomial.
+        rhs = np.r_[np.zeros(target_len - len(A_cl_total)), A_cl_total]
+        theta, *_ = np.linalg.lstsq(M, rhs, rcond=None)
+        S_tilde = theta[:nS]
+        R_coeffs = theta[nS:]
+        if Integrator:
+            S_coeffs = np.convolve(S_tilde, INT)
+        else:
+            S_coeffs = S_tilde
+    else:
+        # Two-step Landau: target A_m, then apply A0 factorisation.
+        A_m_padded = np.r_[np.zeros(target_len - len(A_m)), A_m]
+        theta, *_ = np.linalg.lstsq(M, A_m_padded, rcond=None)
+        S_tilde_prime = theta[:nS]
+        R_prime = theta[nS:]
+        if Integrator:
+            S_prime = np.convolve(S_tilde_prime, INT)
+        else:
+            S_prime = S_tilde_prime
+        S_coeffs = np.convolve(A0, S_prime)
+        R_coeffs = np.convolve(A0, R_prime)
 
     # Verify: A*S + B*R should equal A_cl_total = A_m * A0
     den_check = np.polyadd(np.polymul(A, S_coeffs), np.polymul(B, R_coeffs))
@@ -207,11 +248,12 @@ def Compute_Denominator_Matching_RST(A_cl: list, plant_discrete_tf, Integrator=T
         )
 
     # ------------------------------------------------------------
-    # 6. Compute T = t0 · A0
+    # 5. Compute T = t0 · A0
     #
     #    H_ry = B·T / (A·S + B·R) = B·(t0·A0) / (A_m·A0) = t0·B / A_m
+    #    The A0 factor in T cancels with the A0 factor in the denominator A_cl_total,
+    #    so the reference-to-output dynamics are governed by A_m alone.
     #    DC gain condition: t0 · B(1) / A_m(1) = 1  =>  t0 = A_m(1) / B(1)
-    #    A0 poles cancel from the reference-to-output transfer function.
     # ------------------------------------------------------------
     B1 = np.polyval(B, 1)
     Am1 = np.polyval(A_m, 1)
@@ -361,10 +403,16 @@ def Compute_Desired_RST(Desired_TF, plant_discrete_tf, Integrator=True, A0=None)
 
     # Stability check on total polynomial
     poles_total = np.roots(A_cl_total)
-    if np.any(np.abs(poles_total) >= 1.0 - 1e-8):
+    if np.any(np.abs(poles_total) > 1.0 + 1e-8):
         raise ValueError(
-            "A_m * A0 must have all poles strictly inside the unit circle "
-            "for a bounded discrete step response."
+            "A_m * A0 contains poles outside the unit circle. "
+            "Ensure all roots of A_m and A0 are inside the unit disk."
+        )
+    if np.any(np.isclose(np.abs(poles_total), 1.0, atol=1e-8)):
+        warnings.warn(
+            "A_m * A0 contains a pole on the unit circle. "
+            "Closed-loop response may be marginally stable.",
+            UserWarning
         )
 
     # ------------------------------------------------------------

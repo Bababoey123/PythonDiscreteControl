@@ -7,6 +7,7 @@ Full documentation can be accessed [here](https://bababoey123.github.io/PythonDi
 ## Table of Contents
 
 - [Architecture](#architecture)
+- [Notebooks](#notebooks)
 - [Plant Model](#plant-model)
 - [Simulation Layer](#simulation-layer)
 - [Controllers](#controllers)
@@ -27,9 +28,10 @@ PythonDiscreteControl_Dev/
 │   └── BallBeam/
 │       ├── ballbeam_config.py      # Physical parameters and timing constants
 │       ├── TransferFunctions.py    # Continuous and ZOH-discrete plant TF
-│       └── StateSpace.py          # Linearised continuous + discrete state-space
+│       ├── StateSpace.py           # Linearised continuous + discrete state-space
+│       └── NonlinearDynamics.py    # Nonlinear ODE model (full sin(α) term)
 ├── Simulation/
-│   ├── simulation.py              # TFSimulator, HybridSim
+│   ├── simulation.py              # TFSimulator, HybridSim, NonLinearHybridSim
 │   └── runners.py                 # High-level simulation entry points
 ├── Control/
 │   ├── DiscretePID.py             # Backward-Euler PID controller
@@ -40,10 +42,24 @@ PythonDiscreteControl_Dev/
 └── Metrics_Plotting/
     ├── SimLog.py                  # Simulation data recorder
     ├── Plotting.py                # Time-domain plots
-    └── Metrics.py                 # Response metrics (placeholder)
+    └── Metrics.py                 # Response metrics (rise time, settling time, margins)
 ```
 
 Each layer has a strict interface contract: controllers must expose `step(y)` and `setReference(r)`; simulators accept any object satisfying this interface.
+
+---
+
+## Notebooks
+
+Three Jupyter notebooks demonstrate the full design workflow on the ball-and-beam plant:
+
+| Notebook | Content |
+|---|---|
+| `DoubleIntégrateurAnalyse.ipynb` | Open-loop analysis — step and impulse responses, ZOH discretisation, continuous vs discrete comparison |
+| `CommandeDoubleIntégrateur_PID.ipynb` | Discrete PID design — gain tuning, stability margins, disturbance rejection |
+| `CommandeDoubleIntégrateur_RST.ipynb` | RST polynomial design — Diophantine synthesis, observer polynomial, linear and nonlinear closed-loop simulation |
+
+Run cells in order from top to bottom. Use **Run → Run All Cells** for a clean execution from a fresh kernel.
 
 ---
 
@@ -66,7 +82,7 @@ where `H = m·g·d / (L · (J/R² + m))` is computed from the physical parameter
 | Lever arm | d | 0.03 m |
 | Beam length | L | 1.0 m |
 | Linearised gain | H | ≈ 0.210 |
-| Sampling period | dt | 0.02 s (50 Hz) |
+| Default sampling period | dt | 0.02 s (50 Hz) |
 
 The ZOH-discrete plant is:
 
@@ -85,6 +101,14 @@ from Models.BallBeam import ballbeam_config
 
 model = TransferFunctionModel(ballbeam_config)  # model.Tf_cont, model.Tf_dis
 ss    = LinearStateSpaceModel(ballbeam_config)  # ss.A, ss.B, ss.C, ss.Ad, ss.Bd
+```
+
+The nonlinear model uses the full `sin(α)` term instead of the small-angle approximation:
+
+```python
+from Models.BallBeam.NonlinearDynamics import NonlinearBallBeamModel
+
+nl = NonlinearBallBeamModel(ballbeam_config)   # nl.f(X, u) — ODE right-hand side
 ```
 
 ---
@@ -111,7 +135,7 @@ The coefficients are read directly from the `ct.TransferFunction` numerator/deno
 
 ### `HybridSim`
 
-Couples a **continuous state-space plant** (RK4 at `dt_plant = 1 ms`) with a **discrete controller** (ZOH at `dt`). This emulates a real embedded control loop where the microcontroller samples the sensor and holds the actuator command for one period.
+Couples a **continuous linear state-space plant** (RK4 at `dt_plant = 1 ms`) with a **discrete controller** (ZOH at `dt`). This emulates a real embedded control loop where the microcontroller samples the sensor and holds the actuator command for one period.
 
 ```python
 from Simulation.simulation import HybridSim
@@ -120,7 +144,20 @@ hybrid = HybridSim(ss, ballbeam_config)
 X_next = hybrid.rk4_step(X, u_k)   # advance one integration step
 ```
 
-The inner integration step (`dt_plant = 1 ms`) is 20× finer than the control period (`dt = 20 ms`) by default.
+### `NonLinearHybridSim`
+
+Identical structure to `HybridSim` but uses the **nonlinear ODE** `f(X, u)` from `NonlinearBallBeamModel` instead of the linear state-space matrices.
+
+```python
+from Simulation.simulation import NonLinearHybridSim
+from Models.BallBeam.NonlinearDynamics import NonlinearBallBeamModel
+
+nl_model = NonlinearBallBeamModel(ballbeam_config)
+nl_sim   = NonLinearHybridSim(nl_model, ballbeam_config)
+X_next   = nl_sim.rk4_step(X, u_k)
+```
+
+Both hybrid simulators integrate at `dt_plant = 1 ms`. The ratio of control period to integration step depends on the chosen `dt` (e.g. 20× for `dt = 20 ms`, 50× for `dt = 50 ms`).
 
 ---
 
@@ -182,38 +219,42 @@ R, S, T can be obtained from the PID equivalent representation or from the RST s
 `Utils/computeRST.py` implements polynomial RST synthesis by solving the **Diophantine equation**:
 
 ```
-A(z)·S(z) + B(z)·R(z) = A_cl(z)·A0(z)
+A(z)·S(z) + B(z)·R(z) = A_m(z)·A0(z)
 ```
 
-where `A`, `B` are the plant denominator and numerator, `A_cl` contains the **dominant closed-loop poles**, and `A0` is the **observer polynomial**.
+where `A`, `B` are the plant denominator and numerator, `A_m` contains the **dominant closed-loop poles**, and `A0` is the **observer polynomial** (faster auxiliary poles).
 
 ### `Compute_Denominator_Matching_RST`
 
-Pole placement by specifying the desired closed-loop denominator directly.
+Pole placement by specifying the desired dominant denominator and an optional observer polynomial.
 
 ```python
 from Utils.computeRST import Compute_Denominator_Matching_RST
 
-A_cl = [1, -1.2, 0.4, -0.064]          # desired dominant poles
+A_m = [1, -1.2, 0.4]                # desired dominant poles
+A0  = [1, -0.5]                     # observer pole at z = 0.5 (faster than A_m)
+
 S, R, T, H_cl = Compute_Denominator_Matching_RST(
-    A_cl,
+    A_m,
     plant_discrete_tf = model.Tf_dis,
-    Integrator = True,                  # forces (z-1) factor in S
-    A0 = None                           # optional observer polynomial
+    Integrator = True,               # forces (z-1) factor in S
+    A0 = A0                          # optional; defaults to [1] (no observer pole)
 )
 ```
 
-**`Integrator=True`** (default): forces `S = (z−1)·S̃`, guaranteeing zero steady-state error for step references. The Diophantine is then exactly determined (rows = unknowns).
+**`Integrator=True`** (default): forces `S = (z−1)·S̃`, guaranteeing zero steady-state error for step references and exact rejection of constant disturbances (`S(1) = 0`).
 
-**`Integrator=False`**: standard form, system is underdetermined by one equation (zero-padded target).
+**`A0`** (observer polynomial): its roots become additional closed-loop poles, placed faster than the dominant ones. `T = t₀·A0` ensures A0 cancels from the reference-to-output transfer function:
 
-**`A0`** (observer polynomial): its roots become **additional closed-loop poles**, placed faster than the dominant ones. The total characteristic polynomial is `A_cl·A0`. Degree constraint: `deg(A_cl) + deg(A0) ≤ deg(A) + deg(B)`.
-
-```python
-# Example: add two observer poles at z = 0.5
-A0 = [1, -0.5]   # (z - 0.5)
-S, R, T, H_cl = Compute_Denominator_Matching_RST(A_cl, model.Tf_dis, A0=A0)
 ```
+H_ry = B·T / (A·S + B·R) = B·t₀·A0 / (A_m·A0) = t₀·B / A_m
+```
+
+The closed-loop response therefore follows the dominant model `A_m` only, independent of `A0`.
+
+**Solve strategy**: when the full characteristic polynomial `A_m·A0` fits in the Diophantine system, the equation is solved **directly** against `A_m·A0`. When it does not fit, the function falls back to a **two-step Landau factorisation** (solve against `A_m`, then apply `S = A0·S'`, `R = A0·R'`). Both paths enforce `S[0] > 0`, which is required for the `1/S` filter to drive the plant in the correct direction.
+
+**Degree constraint**: `deg(A_m)` must not exceed the system capacity (number of Diophantine equations). `deg(A_m) + deg(A0)` can exceed it when the Landau fallback is used.
 
 ### `Compute_Desired_RST`
 
@@ -235,7 +276,7 @@ T is computed by exact polynomial division `B_cl / B`, enforcing the desired clo
 
 ### Theory
 
-Both functions use a **Toeplitz convolution matrix** to set up the linear system. The least-squares solver `np.linalg.lstsq` is used (exact solution when the system is square; least-squares fallback otherwise).
+Both functions use a **Toeplitz convolution matrix** (Sylvester matrix) to set up the linear system. The least-squares solver `np.linalg.lstsq` is used (exact solution when the system is square; least-squares fallback otherwise).
 
 Stability of the desired poles and A0 is checked automatically:
 - `Compute_Denominator_Matching_RST` rejects poles strictly outside the unit circle; warns on poles on the unit circle.
@@ -314,23 +355,25 @@ log = run_discrete_control(
 ### Open-loop continuous (hybrid plant)
 
 ```python
-from Simulation.runners import run_continuous_step_response, run_continuous_impulse_respone
+from Simulation.runners import run_continuous_step_response, run_continuous_impulse_response
 
 step_log    = run_continuous_step_response(hybrid, X_0, SimLog())
-impulse_log = run_continuous_impulse_respone(hybrid, X_0, SimLog())
+impulse_log = run_continuous_impulse_response(hybrid, X_0, SimLog())
 ```
 
 Both use RK4 at `dt_plant = 1 ms`. The impulse magnitude is `1/dt_plant`.
 
 ### Closed-loop hybrid
 
+Works with both `HybridSim` (linear plant) and `NonLinearHybridSim` (nonlinear plant).
+
 ```python
 from Simulation.runners import run_continuous_control_loop
 
 log = run_continuous_control_loop(
-    hybrid, controller, r=1.0, X_0=np.array([[0],[0]]),
+    hybrid_or_nl_sim, controller, r=1.0, X_0=np.array([[0],[0]]),
     Logger=SimLog(),
-    Disturb=False,   # True: adds step disturbance of 6.0 after t = 3 s
+    Disturb=False,   # True: adds step disturbance of 2.0 after t = 3 s
     Saturate=True    # True: clips u to [−10, +10]
 )
 ```
@@ -366,6 +409,18 @@ plot = Plotting()
 plot.plotAll(log, title="Step response")   # two figures: y(t) and u(t)
 ```
 
+### `Metrics`
+
+```python
+from Metrics_Plotting.Metrics import Metrics
+
+m = Metrics()
+m.response_data(logger, reference)   # prints overshoot, rise time, settling time
+m.Stability(open_loop_tf)            # prints gain margin and phase margin
+```
+
+`response_data` analyses only the pre-disturbance phase (`t ≤ 3 s`). Rise time uses the standard 10 %→90 % IEEE definition; settling time uses a ±10 % tolerance band.
+
 ---
 
 ## Sampled-Data Behaviour
@@ -398,7 +453,7 @@ y_s = [log.y_hist[i] for i in indices]
 
 ## Dependencies
 
-```
+```text
 numpy
 scipy
 control (python-control)

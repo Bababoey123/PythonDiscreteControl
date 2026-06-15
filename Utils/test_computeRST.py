@@ -1,5 +1,6 @@
 import numpy as np
 import control as ct
+
 import computeRST
 
 
@@ -88,9 +89,8 @@ def test_compute_denominator_matching_rst_with_A0():
     R = trim(R_tf.num[0][0])
     T = trim(T_tf.num[0][0])
 
-    # Landau property: A0 must divide S, R, and T
-    _check_a0_factor(S, A0, "S")
-    _check_a0_factor(R, A0, "R")
+    # A0 must divide T (cancels A0 from H_cl numerator).
+    # S and R come directly from the full Diophantine — A0 need not divide them.
     _check_a0_factor(T, A0, "T")
 
     # Diophantine: A*S + B*R = A_m * A0
@@ -108,6 +108,9 @@ def test_compute_denominator_matching_rst_with_A0():
     poles = np.roots(H_cl.den_list[0][0])
     assert np.all(np.abs(poles) < 1.0 + 1e-8), \
         f"Unstable closed-loop poles: {poles[np.abs(poles) >= 1.0]}"
+
+    # S must have a positive leading coefficient (required for correct 1/S sign)
+    assert S[0] > 0, f"S leading coefficient is negative ({S[0]:.4f}); simulation would diverge"
 
     print("test_compute_denominator_matching_rst_with_A0 PASSED.")
 
@@ -162,12 +165,10 @@ def test_compute_denominator_matching_rst_with_A0_and_integrator():
     R = trim(R_tf.num[0][0])
     T = trim(T_tf.num[0][0])
 
-    # S must contain A0 as a factor
-    _check_a0_factor(S, A0, "S")
-    _check_a0_factor(R, A0, "R")
+    # A0 must divide T. S and R come from the full Diophantine (no A0 factorisation).
     _check_a0_factor(T, A0, "T")
 
-    # S must also contain (z-1) as a factor (integrator)
+    # S must contain (z-1) as a factor (integrator)
     _, rem_int = np.polydiv(S, np.array([1.0, -1.0]))
     assert np.allclose(np.trim_zeros(rem_int, 'f'), 0, atol=1e-7), \
         "S does not contain the integrator factor (z-1)"
@@ -182,6 +183,9 @@ def test_compute_denominator_matching_rst_with_A0_and_integrator():
     # DC gain = 1
     assert np.isclose(ct.dcgain(H_cl), 1.0, atol=1e-5), \
         f"DC gain is {ct.dcgain(H_cl):.6f}, expected 1.0"
+
+    # S must have a positive leading coefficient (required for correct 1/S sign)
+    assert S[0] > 0, f"S leading coefficient is negative ({S[0]:.4f}); simulation would diverge"
 
     print("test_compute_denominator_matching_rst_with_A0_and_integrator PASSED.")
 
