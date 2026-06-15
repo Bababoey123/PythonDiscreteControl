@@ -128,15 +128,15 @@ Simulation<wbr>.simulation    </h1>
 
                         <label class="view-source-button" for="mod-simulation-view-source"><span>View Source</span></label>
 
-                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-</span><span id="L-2"><a href="#L-2"><span class="linenos">  2</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">control</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ct</span>
+                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</span><span id="L-2"><a href="#L-2"><span class="linenos">  2</span></a><span class="kn">import</span> <span class="nn">control</span> <span class="k">as</span> <span class="nn">ct</span>
 </span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a>
-</span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">Models.BallBeam.StateSpace</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinearStateSpaceModel</span>
-</span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">Models.BallBeam.NonlinearDynamics</span><span class="w"> </span><span class="kn">import</span> <span class="n">NonlinearBallBeamModel</span>
-</span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">Metrics_Plotting.SimLog</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimLog</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="kn">from</span> <span class="nn">Models.BallBeam.StateSpace</span> <span class="kn">import</span> <span class="n">LinearStateSpaceModel</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="kn">from</span> <span class="nn">Models.BallBeam.NonlinearDynamics</span> <span class="kn">import</span> <span class="n">NonlinearBallBeamModel</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a><span class="kn">from</span> <span class="nn">Metrics_Plotting.SimLog</span> <span class="kn">import</span> <span class="n">SimLog</span>
 </span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a>
 </span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a>
-</span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a><span class="k">class</span><span class="w"> </span><span class="nc">TFSimulator</span><span class="p">:</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a><span class="k">class</span> <span class="nc">TFSimulator</span><span class="p">:</span>
 </span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Simulates a discrete transfer function step-by-step using its difference equation.</span>
 </span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a>
 </span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a><span class="sd">    Given a transfer function B(z)/A(z), each call to ``step`` advances the recursion:</span>
@@ -147,7 +147,7 @@ Simulation<wbr>.simulation    </h1>
 </span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a><span class="sd">    only needs to supply the current input at each time step.</span>
 </span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a>
-</span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tf</span><span class="p">,</span> <span class="n">X_0</span><span class="p">):</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tf</span><span class="p">,</span> <span class="n">X_0</span><span class="p">):</span>
 </span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialises the simulator from a discrete transfer function.</span>
 </span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a>
 </span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a><span class="sd">        Args:</span>
@@ -165,7 +165,7 @@ Simulation<wbr>.simulation    </h1>
 </span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a>        <span class="k">else</span><span class="p">:</span>
 </span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">y_hist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
 </span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a>
-</span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_0</span><span class="p">):</span>
+</span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_0</span><span class="p">):</span>
 </span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resets the input and output history buffers to zero.</span>
 </span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a>
 </span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a><span class="sd">        Call this before starting a new simulation run to avoid carry-over from</span>
@@ -180,7 +180,7 @@ Simulation<wbr>.simulation    </h1>
 </span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a>        <span class="k">else</span><span class="p">:</span>
 </span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">y_hist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
 </span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a>
-</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
 </span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Advances the difference equation by one sample and returns the new output y[k].</span>
 </span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a>
 </span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a><span class="sd">        Implements:</span>
@@ -206,7 +206,7 @@ Simulation<wbr>.simulation    </h1>
 </span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a>        <span class="k">return</span> <span class="n">y</span>
 </span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>
 </span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>
-</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a><span class="k">class</span><span class="w"> </span><span class="nc">HybridSim</span><span class="p">:</span>
+</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a><span class="k">class</span> <span class="nc">HybridSim</span><span class="p">:</span>
 </span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Hybrid simulator: continuous linear plant (state-space) driven by a discrete controller.</span>
 </span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a>
 </span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a><span class="sd">    The plant is integrated at a fine timestep ``dt_plant`` = 1 ms (1 kHz) using fourth-order</span>
@@ -215,7 +215,7 @@ Simulation<wbr>.simulation    </h1>
 </span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a><span class="sd">    enough to make the integration error negligible compared with sampling effects.</span>
 </span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>
-</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">StateSpaceModel</span><span class="p">:</span> <span class="n">LinearStateSpaceModel</span><span class="p">,</span> <span class="n">config_file</span><span class="p">):</span>
+</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">StateSpaceModel</span><span class="p">:</span> <span class="n">LinearStateSpaceModel</span><span class="p">,</span> <span class="n">config_file</span><span class="p">):</span>
 </span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialises the hybrid simulator with a linear continuous plant.</span>
 </span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a>
 </span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a><span class="sd">        Args:</span>
@@ -234,7 +234,7 @@ Simulation<wbr>.simulation    </h1>
 </span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">C</span> <span class="o">=</span> <span class="n">StateSpaceModel</span><span class="o">.</span><span class="n">C</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
 </span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">config_file</span> <span class="o">=</span> <span class="n">config_file</span>
 </span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>
-</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">rk4_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">u_k</span><span class="p">):</span>
+</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>    <span class="k">def</span> <span class="nf">rk4_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">u_k</span><span class="p">):</span>
 </span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Advances the continuous state one integration step using classical RK4.</span>
 </span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a>
 </span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a><span class="sd">        Integrates  Ẋ = A·X + B·u  over one ``dt_plant`` interval with the control</span>
@@ -247,7 +247,7 @@ Simulation<wbr>.simulation    </h1>
 </span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a><span class="sd">        Returns:</span>
 </span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a><span class="sd">            np.ndarray: Updated state vector X[k+1], shape (n, 1).</span>
 </span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>        <span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>        <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
 </span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">@</span> <span class="n">X</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">B</span> <span class="o">@</span> <span class="n">u_k</span>
 </span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a>
 </span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a>        <span class="n">k1</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
@@ -258,7 +258,7 @@ Simulation<wbr>.simulation    </h1>
 </span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a>        <span class="k">return</span> <span class="n">X</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt_plant</span> <span class="o">/</span> <span class="mi">6</span> <span class="o">*</span> <span class="p">(</span><span class="n">k1</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">k2</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">k3</span> <span class="o">+</span> <span class="n">k4</span><span class="p">)</span>
 </span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a>
 </span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a>
-</span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a><span class="k">class</span><span class="w"> </span><span class="nc">NonLinearHybridSim</span><span class="p">:</span>
+</span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a><span class="k">class</span> <span class="nc">NonLinearHybridSim</span><span class="p">:</span>
 </span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Hybrid simulator: nonlinear ball-and-beam plant driven by a discrete controller.</span>
 </span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a>
 </span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a><span class="sd">    Identical structure to ``HybridSim`` but uses the nonlinear ODE ``f(X, u)`` from</span>
@@ -270,7 +270,7 @@ Simulation<wbr>.simulation    </h1>
 </span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a><span class="sd">    X = [[r], [ṙ]].</span>
 </span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a>
-</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">NonlinearBallBeamModel</span><span class="p">,</span> <span class="n">config_file</span><span class="p">):</span>
+</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">NonlinearBallBeamModel</span><span class="p">,</span> <span class="n">config_file</span><span class="p">):</span>
 </span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialises the nonlinear hybrid simulator.</span>
 </span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a>
 </span><span id="L-146"><a href="#L-146"><span class="linenos">146</span></a><span class="sd">        Args:</span>
@@ -289,7 +289,7 @@ Simulation<wbr>.simulation    </h1>
 </span><span id="L-159"><a href="#L-159"><span class="linenos">159</span></a>
 </span><span id="L-160"><a href="#L-160"><span class="linenos">160</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">config_file</span> <span class="o">=</span> <span class="n">config_file</span>
 </span><span id="L-161"><a href="#L-161"><span class="linenos">161</span></a>
-</span><span id="L-162"><a href="#L-162"><span class="linenos">162</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">rk4_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">u_k</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+</span><span id="L-162"><a href="#L-162"><span class="linenos">162</span></a>    <span class="k">def</span> <span class="nf">rk4_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">u_k</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 </span><span id="L-163"><a href="#L-163"><span class="linenos">163</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Advances the nonlinear plant state one integration step using classical RK4.</span>
 </span><span id="L-164"><a href="#L-164"><span class="linenos">164</span></a>
 </span><span id="L-165"><a href="#L-165"><span class="linenos">165</span></a><span class="sd">        Integrates  Ẋ = f(X, u)  over one ``dt_plant`` interval with the control</span>
@@ -324,7 +324,7 @@ Simulation<wbr>.simulation    </h1>
 
     </div>
     <a class="headerlink" href="#TFSimulator"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="TFSimulator-10"><a href="#TFSimulator-10"><span class="linenos">10</span></a><span class="k">class</span><span class="w"> </span><span class="nc">TFSimulator</span><span class="p">:</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="TFSimulator-10"><a href="#TFSimulator-10"><span class="linenos">10</span></a><span class="k">class</span> <span class="nc">TFSimulator</span><span class="p">:</span>
 </span><span id="TFSimulator-11"><a href="#TFSimulator-11"><span class="linenos">11</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Simulates a discrete transfer function step-by-step using its difference equation.</span>
 </span><span id="TFSimulator-12"><a href="#TFSimulator-12"><span class="linenos">12</span></a>
 </span><span id="TFSimulator-13"><a href="#TFSimulator-13"><span class="linenos">13</span></a><span class="sd">    Given a transfer function B(z)/A(z), each call to ``step`` advances the recursion:</span>
@@ -335,7 +335,7 @@ Simulation<wbr>.simulation    </h1>
 </span><span id="TFSimulator-18"><a href="#TFSimulator-18"><span class="linenos">18</span></a><span class="sd">    only needs to supply the current input at each time step.</span>
 </span><span id="TFSimulator-19"><a href="#TFSimulator-19"><span class="linenos">19</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="TFSimulator-20"><a href="#TFSimulator-20"><span class="linenos">20</span></a>
-</span><span id="TFSimulator-21"><a href="#TFSimulator-21"><span class="linenos">21</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tf</span><span class="p">,</span> <span class="n">X_0</span><span class="p">):</span>
+</span><span id="TFSimulator-21"><a href="#TFSimulator-21"><span class="linenos">21</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tf</span><span class="p">,</span> <span class="n">X_0</span><span class="p">):</span>
 </span><span id="TFSimulator-22"><a href="#TFSimulator-22"><span class="linenos">22</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialises the simulator from a discrete transfer function.</span>
 </span><span id="TFSimulator-23"><a href="#TFSimulator-23"><span class="linenos">23</span></a>
 </span><span id="TFSimulator-24"><a href="#TFSimulator-24"><span class="linenos">24</span></a><span class="sd">        Args:</span>
@@ -353,7 +353,7 @@ Simulation<wbr>.simulation    </h1>
 </span><span id="TFSimulator-36"><a href="#TFSimulator-36"><span class="linenos">36</span></a>        <span class="k">else</span><span class="p">:</span>
 </span><span id="TFSimulator-37"><a href="#TFSimulator-37"><span class="linenos">37</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">y_hist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
 </span><span id="TFSimulator-38"><a href="#TFSimulator-38"><span class="linenos">38</span></a>
-</span><span id="TFSimulator-39"><a href="#TFSimulator-39"><span class="linenos">39</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_0</span><span class="p">):</span>
+</span><span id="TFSimulator-39"><a href="#TFSimulator-39"><span class="linenos">39</span></a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_0</span><span class="p">):</span>
 </span><span id="TFSimulator-40"><a href="#TFSimulator-40"><span class="linenos">40</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resets the input and output history buffers to zero.</span>
 </span><span id="TFSimulator-41"><a href="#TFSimulator-41"><span class="linenos">41</span></a>
 </span><span id="TFSimulator-42"><a href="#TFSimulator-42"><span class="linenos">42</span></a><span class="sd">        Call this before starting a new simulation run to avoid carry-over from</span>
@@ -368,7 +368,7 @@ Simulation<wbr>.simulation    </h1>
 </span><span id="TFSimulator-51"><a href="#TFSimulator-51"><span class="linenos">51</span></a>        <span class="k">else</span><span class="p">:</span>
 </span><span id="TFSimulator-52"><a href="#TFSimulator-52"><span class="linenos">52</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">y_hist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
 </span><span id="TFSimulator-53"><a href="#TFSimulator-53"><span class="linenos">53</span></a>
-</span><span id="TFSimulator-54"><a href="#TFSimulator-54"><span class="linenos">54</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+</span><span id="TFSimulator-54"><a href="#TFSimulator-54"><span class="linenos">54</span></a>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
 </span><span id="TFSimulator-55"><a href="#TFSimulator-55"><span class="linenos">55</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Advances the difference equation by one sample and returns the new output y[k].</span>
 </span><span id="TFSimulator-56"><a href="#TFSimulator-56"><span class="linenos">56</span></a>
 </span><span id="TFSimulator-57"><a href="#TFSimulator-57"><span class="linenos">57</span></a><span class="sd">        Implements:</span>
@@ -416,7 +416,7 @@ only needs to supply the current input at each time step.</p>
 
     </div>
     <a class="headerlink" href="#TFSimulator.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="TFSimulator.__init__-21"><a href="#TFSimulator.__init__-21"><span class="linenos">21</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tf</span><span class="p">,</span> <span class="n">X_0</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="TFSimulator.__init__-21"><a href="#TFSimulator.__init__-21"><span class="linenos">21</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tf</span><span class="p">,</span> <span class="n">X_0</span><span class="p">):</span>
 </span><span id="TFSimulator.__init__-22"><a href="#TFSimulator.__init__-22"><span class="linenos">22</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialises the simulator from a discrete transfer function.</span>
 </span><span id="TFSimulator.__init__-23"><a href="#TFSimulator.__init__-23"><span class="linenos">23</span></a>
 </span><span id="TFSimulator.__init__-24"><a href="#TFSimulator.__init__-24"><span class="linenos">24</span></a><span class="sd">        Args:</span>
@@ -490,7 +490,7 @@ only needs to supply the current input at each time step.</p>
 
     </div>
     <a class="headerlink" href="#TFSimulator.reset"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="TFSimulator.reset-39"><a href="#TFSimulator.reset-39"><span class="linenos">39</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_0</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="TFSimulator.reset-39"><a href="#TFSimulator.reset-39"><span class="linenos">39</span></a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_0</span><span class="p">):</span>
 </span><span id="TFSimulator.reset-40"><a href="#TFSimulator.reset-40"><span class="linenos">40</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resets the input and output history buffers to zero.</span>
 </span><span id="TFSimulator.reset-41"><a href="#TFSimulator.reset-41"><span class="linenos">41</span></a>
 </span><span id="TFSimulator.reset-42"><a href="#TFSimulator.reset-42"><span class="linenos">42</span></a><span class="sd">        Call this before starting a new simulation run to avoid carry-over from</span>
@@ -529,7 +529,7 @@ a previous run.</p>
 
     </div>
     <a class="headerlink" href="#TFSimulator.step"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="TFSimulator.step-54"><a href="#TFSimulator.step-54"><span class="linenos">54</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="TFSimulator.step-54"><a href="#TFSimulator.step-54"><span class="linenos">54</span></a>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
 </span><span id="TFSimulator.step-55"><a href="#TFSimulator.step-55"><span class="linenos">55</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Advances the difference equation by one sample and returns the new output y[k].</span>
 </span><span id="TFSimulator.step-56"><a href="#TFSimulator.step-56"><span class="linenos">56</span></a>
 </span><span id="TFSimulator.step-57"><a href="#TFSimulator.step-57"><span class="linenos">57</span></a><span class="sd">        Implements:</span>
@@ -582,7 +582,7 @@ a previous run.</p>
 
     </div>
     <a class="headerlink" href="#HybridSim"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="HybridSim-80"><a href="#HybridSim-80"><span class="linenos"> 80</span></a><span class="k">class</span><span class="w"> </span><span class="nc">HybridSim</span><span class="p">:</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="HybridSim-80"><a href="#HybridSim-80"><span class="linenos"> 80</span></a><span class="k">class</span> <span class="nc">HybridSim</span><span class="p">:</span>
 </span><span id="HybridSim-81"><a href="#HybridSim-81"><span class="linenos"> 81</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Hybrid simulator: continuous linear plant (state-space) driven by a discrete controller.</span>
 </span><span id="HybridSim-82"><a href="#HybridSim-82"><span class="linenos"> 82</span></a>
 </span><span id="HybridSim-83"><a href="#HybridSim-83"><span class="linenos"> 83</span></a><span class="sd">    The plant is integrated at a fine timestep ``dt_plant`` = 1 ms (1 kHz) using fourth-order</span>
@@ -591,7 +591,7 @@ a previous run.</p>
 </span><span id="HybridSim-86"><a href="#HybridSim-86"><span class="linenos"> 86</span></a><span class="sd">    enough to make the integration error negligible compared with sampling effects.</span>
 </span><span id="HybridSim-87"><a href="#HybridSim-87"><span class="linenos"> 87</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="HybridSim-88"><a href="#HybridSim-88"><span class="linenos"> 88</span></a>
-</span><span id="HybridSim-89"><a href="#HybridSim-89"><span class="linenos"> 89</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">StateSpaceModel</span><span class="p">:</span> <span class="n">LinearStateSpaceModel</span><span class="p">,</span> <span class="n">config_file</span><span class="p">):</span>
+</span><span id="HybridSim-89"><a href="#HybridSim-89"><span class="linenos"> 89</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">StateSpaceModel</span><span class="p">:</span> <span class="n">LinearStateSpaceModel</span><span class="p">,</span> <span class="n">config_file</span><span class="p">):</span>
 </span><span id="HybridSim-90"><a href="#HybridSim-90"><span class="linenos"> 90</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialises the hybrid simulator with a linear continuous plant.</span>
 </span><span id="HybridSim-91"><a href="#HybridSim-91"><span class="linenos"> 91</span></a>
 </span><span id="HybridSim-92"><a href="#HybridSim-92"><span class="linenos"> 92</span></a><span class="sd">        Args:</span>
@@ -610,7 +610,7 @@ a previous run.</p>
 </span><span id="HybridSim-105"><a href="#HybridSim-105"><span class="linenos">105</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">C</span> <span class="o">=</span> <span class="n">StateSpaceModel</span><span class="o">.</span><span class="n">C</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
 </span><span id="HybridSim-106"><a href="#HybridSim-106"><span class="linenos">106</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">config_file</span> <span class="o">=</span> <span class="n">config_file</span>
 </span><span id="HybridSim-107"><a href="#HybridSim-107"><span class="linenos">107</span></a>
-</span><span id="HybridSim-108"><a href="#HybridSim-108"><span class="linenos">108</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">rk4_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">u_k</span><span class="p">):</span>
+</span><span id="HybridSim-108"><a href="#HybridSim-108"><span class="linenos">108</span></a>    <span class="k">def</span> <span class="nf">rk4_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">u_k</span><span class="p">):</span>
 </span><span id="HybridSim-109"><a href="#HybridSim-109"><span class="linenos">109</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Advances the continuous state one integration step using classical RK4.</span>
 </span><span id="HybridSim-110"><a href="#HybridSim-110"><span class="linenos">110</span></a>
 </span><span id="HybridSim-111"><a href="#HybridSim-111"><span class="linenos">111</span></a><span class="sd">        Integrates  Ẋ = A·X + B·u  over one ``dt_plant`` interval with the control</span>
@@ -623,7 +623,7 @@ a previous run.</p>
 </span><span id="HybridSim-118"><a href="#HybridSim-118"><span class="linenos">118</span></a><span class="sd">        Returns:</span>
 </span><span id="HybridSim-119"><a href="#HybridSim-119"><span class="linenos">119</span></a><span class="sd">            np.ndarray: Updated state vector X[k+1], shape (n, 1).</span>
 </span><span id="HybridSim-120"><a href="#HybridSim-120"><span class="linenos">120</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="HybridSim-121"><a href="#HybridSim-121"><span class="linenos">121</span></a>        <span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+</span><span id="HybridSim-121"><a href="#HybridSim-121"><span class="linenos">121</span></a>        <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
 </span><span id="HybridSim-122"><a href="#HybridSim-122"><span class="linenos">122</span></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">@</span> <span class="n">X</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">B</span> <span class="o">@</span> <span class="n">u_k</span>
 </span><span id="HybridSim-123"><a href="#HybridSim-123"><span class="linenos">123</span></a>
 </span><span id="HybridSim-124"><a href="#HybridSim-124"><span class="linenos">124</span></a>        <span class="n">k1</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
@@ -654,7 +654,7 @@ enough to make the integration error negligible compared with sampling effects.<
 
     </div>
     <a class="headerlink" href="#HybridSim.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="HybridSim.__init__-89"><a href="#HybridSim.__init__-89"><span class="linenos"> 89</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">StateSpaceModel</span><span class="p">:</span> <span class="n">LinearStateSpaceModel</span><span class="p">,</span> <span class="n">config_file</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="HybridSim.__init__-89"><a href="#HybridSim.__init__-89"><span class="linenos"> 89</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">StateSpaceModel</span><span class="p">:</span> <span class="n">LinearStateSpaceModel</span><span class="p">,</span> <span class="n">config_file</span><span class="p">):</span>
 </span><span id="HybridSim.__init__-90"><a href="#HybridSim.__init__-90"><span class="linenos"> 90</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialises the hybrid simulator with a linear continuous plant.</span>
 </span><span id="HybridSim.__init__-91"><a href="#HybridSim.__init__-91"><span class="linenos"> 91</span></a>
 </span><span id="HybridSim.__init__-92"><a href="#HybridSim.__init__-92"><span class="linenos"> 92</span></a><span class="sd">        Args:</span>
@@ -752,7 +752,7 @@ enough to make the integration error negligible compared with sampling effects.<
 
     </div>
     <a class="headerlink" href="#HybridSim.rk4_step"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="HybridSim.rk4_step-108"><a href="#HybridSim.rk4_step-108"><span class="linenos">108</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">rk4_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">u_k</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="HybridSim.rk4_step-108"><a href="#HybridSim.rk4_step-108"><span class="linenos">108</span></a>    <span class="k">def</span> <span class="nf">rk4_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">u_k</span><span class="p">):</span>
 </span><span id="HybridSim.rk4_step-109"><a href="#HybridSim.rk4_step-109"><span class="linenos">109</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Advances the continuous state one integration step using classical RK4.</span>
 </span><span id="HybridSim.rk4_step-110"><a href="#HybridSim.rk4_step-110"><span class="linenos">110</span></a>
 </span><span id="HybridSim.rk4_step-111"><a href="#HybridSim.rk4_step-111"><span class="linenos">111</span></a><span class="sd">        Integrates  Ẋ = A·X + B·u  over one ``dt_plant`` interval with the control</span>
@@ -765,7 +765,7 @@ enough to make the integration error negligible compared with sampling effects.<
 </span><span id="HybridSim.rk4_step-118"><a href="#HybridSim.rk4_step-118"><span class="linenos">118</span></a><span class="sd">        Returns:</span>
 </span><span id="HybridSim.rk4_step-119"><a href="#HybridSim.rk4_step-119"><span class="linenos">119</span></a><span class="sd">            np.ndarray: Updated state vector X[k+1], shape (n, 1).</span>
 </span><span id="HybridSim.rk4_step-120"><a href="#HybridSim.rk4_step-120"><span class="linenos">120</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="HybridSim.rk4_step-121"><a href="#HybridSim.rk4_step-121"><span class="linenos">121</span></a>        <span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+</span><span id="HybridSim.rk4_step-121"><a href="#HybridSim.rk4_step-121"><span class="linenos">121</span></a>        <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
 </span><span id="HybridSim.rk4_step-122"><a href="#HybridSim.rk4_step-122"><span class="linenos">122</span></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">@</span> <span class="n">X</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">B</span> <span class="o">@</span> <span class="n">u_k</span>
 </span><span id="HybridSim.rk4_step-123"><a href="#HybridSim.rk4_step-123"><span class="linenos">123</span></a>
 </span><span id="HybridSim.rk4_step-124"><a href="#HybridSim.rk4_step-124"><span class="linenos">124</span></a>        <span class="n">k1</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
@@ -804,7 +804,7 @@ input u_k held constant (zero-order hold within the substep).</p>
 
     </div>
     <a class="headerlink" href="#NonLinearHybridSim"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="NonLinearHybridSim-132"><a href="#NonLinearHybridSim-132"><span class="linenos">132</span></a><span class="k">class</span><span class="w"> </span><span class="nc">NonLinearHybridSim</span><span class="p">:</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="NonLinearHybridSim-132"><a href="#NonLinearHybridSim-132"><span class="linenos">132</span></a><span class="k">class</span> <span class="nc">NonLinearHybridSim</span><span class="p">:</span>
 </span><span id="NonLinearHybridSim-133"><a href="#NonLinearHybridSim-133"><span class="linenos">133</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Hybrid simulator: nonlinear ball-and-beam plant driven by a discrete controller.</span>
 </span><span id="NonLinearHybridSim-134"><a href="#NonLinearHybridSim-134"><span class="linenos">134</span></a>
 </span><span id="NonLinearHybridSim-135"><a href="#NonLinearHybridSim-135"><span class="linenos">135</span></a><span class="sd">    Identical structure to ``HybridSim`` but uses the nonlinear ODE ``f(X, u)`` from</span>
@@ -816,7 +816,7 @@ input u_k held constant (zero-order hold within the substep).</p>
 </span><span id="NonLinearHybridSim-141"><a href="#NonLinearHybridSim-141"><span class="linenos">141</span></a><span class="sd">    X = [[r], [ṙ]].</span>
 </span><span id="NonLinearHybridSim-142"><a href="#NonLinearHybridSim-142"><span class="linenos">142</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="NonLinearHybridSim-143"><a href="#NonLinearHybridSim-143"><span class="linenos">143</span></a>
-</span><span id="NonLinearHybridSim-144"><a href="#NonLinearHybridSim-144"><span class="linenos">144</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">NonlinearBallBeamModel</span><span class="p">,</span> <span class="n">config_file</span><span class="p">):</span>
+</span><span id="NonLinearHybridSim-144"><a href="#NonLinearHybridSim-144"><span class="linenos">144</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">NonlinearBallBeamModel</span><span class="p">,</span> <span class="n">config_file</span><span class="p">):</span>
 </span><span id="NonLinearHybridSim-145"><a href="#NonLinearHybridSim-145"><span class="linenos">145</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialises the nonlinear hybrid simulator.</span>
 </span><span id="NonLinearHybridSim-146"><a href="#NonLinearHybridSim-146"><span class="linenos">146</span></a>
 </span><span id="NonLinearHybridSim-147"><a href="#NonLinearHybridSim-147"><span class="linenos">147</span></a><span class="sd">        Args:</span>
@@ -835,7 +835,7 @@ input u_k held constant (zero-order hold within the substep).</p>
 </span><span id="NonLinearHybridSim-160"><a href="#NonLinearHybridSim-160"><span class="linenos">160</span></a>
 </span><span id="NonLinearHybridSim-161"><a href="#NonLinearHybridSim-161"><span class="linenos">161</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">config_file</span> <span class="o">=</span> <span class="n">config_file</span>
 </span><span id="NonLinearHybridSim-162"><a href="#NonLinearHybridSim-162"><span class="linenos">162</span></a>
-</span><span id="NonLinearHybridSim-163"><a href="#NonLinearHybridSim-163"><span class="linenos">163</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">rk4_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">u_k</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+</span><span id="NonLinearHybridSim-163"><a href="#NonLinearHybridSim-163"><span class="linenos">163</span></a>    <span class="k">def</span> <span class="nf">rk4_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">u_k</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 </span><span id="NonLinearHybridSim-164"><a href="#NonLinearHybridSim-164"><span class="linenos">164</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Advances the nonlinear plant state one integration step using classical RK4.</span>
 </span><span id="NonLinearHybridSim-165"><a href="#NonLinearHybridSim-165"><span class="linenos">165</span></a>
 </span><span id="NonLinearHybridSim-166"><a href="#NonLinearHybridSim-166"><span class="linenos">166</span></a><span class="sd">        Integrates  Ẋ = f(X, u)  over one ``dt_plant`` interval with the control</span>
@@ -880,7 +880,7 @@ X = [[r], [ṙ]].</p>
 
     </div>
     <a class="headerlink" href="#NonLinearHybridSim.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="NonLinearHybridSim.__init__-144"><a href="#NonLinearHybridSim.__init__-144"><span class="linenos">144</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">NonlinearBallBeamModel</span><span class="p">,</span> <span class="n">config_file</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="NonLinearHybridSim.__init__-144"><a href="#NonLinearHybridSim.__init__-144"><span class="linenos">144</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">NonlinearBallBeamModel</span><span class="p">,</span> <span class="n">config_file</span><span class="p">):</span>
 </span><span id="NonLinearHybridSim.__init__-145"><a href="#NonLinearHybridSim.__init__-145"><span class="linenos">145</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialises the nonlinear hybrid simulator.</span>
 </span><span id="NonLinearHybridSim.__init__-146"><a href="#NonLinearHybridSim.__init__-146"><span class="linenos">146</span></a>
 </span><span id="NonLinearHybridSim.__init__-147"><a href="#NonLinearHybridSim.__init__-147"><span class="linenos">147</span></a><span class="sd">        Args:</span>
@@ -967,7 +967,7 @@ X = [[r], [ṙ]].</p>
 
     </div>
     <a class="headerlink" href="#NonLinearHybridSim.rk4_step"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="NonLinearHybridSim.rk4_step-163"><a href="#NonLinearHybridSim.rk4_step-163"><span class="linenos">163</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">rk4_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">u_k</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="NonLinearHybridSim.rk4_step-163"><a href="#NonLinearHybridSim.rk4_step-163"><span class="linenos">163</span></a>    <span class="k">def</span> <span class="nf">rk4_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">u_k</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 </span><span id="NonLinearHybridSim.rk4_step-164"><a href="#NonLinearHybridSim.rk4_step-164"><span class="linenos">164</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Advances the nonlinear plant state one integration step using classical RK4.</span>
 </span><span id="NonLinearHybridSim.rk4_step-165"><a href="#NonLinearHybridSim.rk4_step-165"><span class="linenos">165</span></a>
 </span><span id="NonLinearHybridSim.rk4_step-166"><a href="#NonLinearHybridSim.rk4_step-166"><span class="linenos">166</span></a><span class="sd">        Integrates  Ẋ = f(X, u)  over one ``dt_plant`` interval with the control</span>
