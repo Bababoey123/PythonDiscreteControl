@@ -1,23 +1,19 @@
 import numpy as np
 import control as ct
 
+
 class TransferFunctionModel:
-    """Continuous and ZOH-discretised transfer functions of the ball-and-beam plant.
+    """Continuous and ZOH-discretised transfer function for plant.
 
-    The continuous plant is a double integrator: H(s) = H / s².
+    The config must expose:
+        ``num_cont`` — list of continuous numerator coefficients
+        ``den_cont`` — list of continuous denominator coefficients
+        ``dt``       — sampling period [s]
     """
+
     def __init__(self, config_file):
-        """Builds the continuous TF and its ZOH discretisation, then extracts coefficient arrays.
+        self.Tf_cont = ct.tf(config_file.num_cont, config_file.den_cont)
+        self.Tf_dis = ct.c2d(self.Tf_cont, config_file.dt, method='zoh')
 
-        Args:
-            config_file: Plant configuration module; must expose ``H`` (linearised gain)
-                and ``dt`` (sampling period in seconds).
-        """
-        self.Tf_cont=ct.tf(config_file.H,[1,0,0])
-        self.Tf_dis= ct.c2d(self.Tf_cont,config_file.dt,method='zoh')
-
-        self.num_dis=np.asarray(self.Tf_dis.num_list[0][0])
-        self.den_dis=np.asarray(self.Tf_dis.den_list[0][0])
-
-        return
-    
+        self.num_dis = np.asarray(self.Tf_dis.num_list[0][0])
+        self.den_dis = np.asarray(self.Tf_dis.den_list[0][0])

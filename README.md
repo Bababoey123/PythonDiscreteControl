@@ -9,6 +9,9 @@ Full documentation can be accessed [here](https://bababoey123.github.io/PythonDi
 - [Architecture](#architecture)
 - [Notebooks](#notebooks)
 - [Plant Model](#plant-model)
+  - [Generic model interface](#generic-model-interface)
+  - [Ball-and-beam (reference plant)](#ball-and-beam-reference-plant)
+  - [Adding a new plant](#adding-a-new-plant)
 - [Simulation Layer](#simulation-layer)
 - [Controllers](#controllers)
 - [RST Synthesis](#rst-synthesis)
@@ -25,11 +28,14 @@ Full documentation can be accessed [here](https://bababoey123.github.io/PythonDi
 ```
 PythonDiscreteControl_Dev/
 ├── Models/
-│   └── BallBeam/
-│       ├── ballbeam_config.py      # Physical parameters and timing constants
-│       ├── TransferFunctions.py    # Continuous and ZOH-discrete plant TF
-│       ├── StateSpace.py           # Linearised continuous + discrete state-space
-│       └── NonlinearDynamics.py    # Nonlinear ODE model (full sin(α) term)
+│   ├── base.py                    # Abstract base classes (BaseNonlinearModel, BaseLinearStateSpaceModel)
+│   ├── BallBeam/
+│   │   ├── ballbeam_config.py     # Physical parameters, timing, and generic model descriptors
+│   │   ├── TransferFunctions.py   # Continuous and ZOH-discrete plant TF (reads from config)
+│   │   ├── StateSpace.py          # Linearised continuous + discrete state-space (reads from config)
+│   │   └── NonlinearDynamics.py   # Nonlinear ODE model (full sin(α) term)
+│   └── tests/
+│       └── test_models.py         # Unit tests for the Models layer
 ├── Simulation/
 │   ├── simulation.py              # TFSimulator, HybridSim, NonLinearHybridSim
 │   └── runners.py                 # High-level simulation entry points
@@ -45,7 +51,7 @@ PythonDiscreteControl_Dev/
     └── Metrics.py                 # Response metrics (rise time, settling time, margins)
 ```
 
-Each layer has a strict interface contract: controllers must expose `step(y)` and `setReference(r)`; simulators accept any object satisfying this interface.
+Each layer has a strict interface contract: controllers must expose `step(y)` and `setReference(r)`; simulators accept any model that satisfies the base-class interface defined in `Models/base.py`.
 
 ---
 
@@ -65,6 +71,17 @@ Run cells in order from top to bottom. Use **Run → Run All Cells** for a clean
 
 ## Plant Model
 
+### Generic model interface
+
+The Models layer is built around two abstract base classes in `Models/base.py`:
+
+- **`BaseNonlinearModel`** — enforces a `f(X, u)` method (state derivative) and a `C` output matrix. Python raises `TypeError` if a subclass forgets to implement `f`.
+- **`BaseLinearStateSpaceModel`** — type marker that subclasses populate with `A, B, C, D` (continuous) and `Ad, Bd, Cd, Dd` (ZOH-discrete).
+
+The simulators `HybridSim` and `NonLinearHybridSim` depend only on these base classes, so any new plant can be dropped in without touching the simulation layer. See *Adding a new plant* below.
+
+### Ball-and-beam (reference plant)
+
 The reference plant is the **ball-and-beam system**, linearised around the equilibrium as a **double integrator**:
 
 ```
@@ -83,6 +100,17 @@ where `H = m·g·d / (L · (J/R² + m))` is computed from the physical parameter
 | Beam length | L | 1.0 m |
 | Linearised gain | H | ≈ 0.210 |
 | Default sampling period | dt | 0.02 s (50 Hz) |
+
+`ballbeam_config.py` also exposes generic model descriptors consumed by `TransferFunctionModel` and `LinearStateSpaceModel`:
+
+```python
+num_cont = [H]           # continuous TF numerator
+den_cont = [1, 0, 0]    # continuous TF denominator
+A_mat    = [[0, 1], [0, 0]]
+B_mat    = [[0], [H]]
+C_mat    = [[1, 0]]
+D_mat    = [[0]]
+```
 
 The ZOH-discrete plant is:
 
@@ -109,6 +137,26 @@ The nonlinear model uses the full `sin(α)` term instead of the small-angle appr
 from Models.BallBeam.NonlinearDynamics import NonlinearBallBeamModel
 
 nl = NonlinearBallBeamModel(ballbeam_config)   # nl.f(X, u) — ODE right-hand side
+```
+
+### Adding a new plant
+
+1. Create `Models/MyPlant/myplant_config.py` with `num_cont`, `den_cont`, `A_mat`, `B_mat`, `C_mat`, `D_mat`, `dt`, `T`.
+2. Subclass `BaseNonlinearModel` and implement `f(X, u)` and set `self.C`.
+3. Pass the config to `TransferFunctionModel` and `LinearStateSpaceModel` — they work as-is.
+4. Pass the model to `HybridSim` or `NonLinearHybridSim` — no changes required.
+
+```python
+from Models.base import BaseNonlinearModel
+
+class MyPlantModel(BaseNonlinearModel):
+    def __init__(self, config):
+        self.C = np.array(config.C_mat)
+        # store physical params ...
+
+    def f(self, X, u):
+        # return state derivative
+        ...
 ```
 
 ---
@@ -146,7 +194,7 @@ X_next = hybrid.rk4_step(X, u_k)   # advance one integration step
 
 ### `NonLinearHybridSim`
 
-Identical structure to `HybridSim` but uses the **nonlinear ODE** `f(X, u)` from `NonlinearBallBeamModel` instead of the linear state-space matrices.
+Identical structure to `HybridSim` but uses the **nonlinear ODE** `f(X, u)` from any `BaseNonlinearModel` subclass instead of linear state-space matrices. The output matrix `C` is read directly from the model.
 
 ```python
 from Simulation.simulation import NonLinearHybridSim

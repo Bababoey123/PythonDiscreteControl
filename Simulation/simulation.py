@@ -1,8 +1,7 @@
 import numpy as np
 import control as ct
 
-from Models.BallBeam.StateSpace import LinearStateSpaceModel
-from Models.BallBeam.NonlinearDynamics import NonlinearBallBeamModel
+from Models.base import BaseLinearStateSpaceModel, BaseNonlinearModel
 from Metrics_Plotting.SimLog import SimLog
 
 
@@ -12,9 +11,6 @@ class TFSimulator:
     Given a transfer function B(z)/A(z), each call to ``step`` advances the recursion:
         a0·y[k] = b0·u[k] + b1·u[k-1] + … − a1·y[k-1] − a2·y[k-2] − …
 
-    This is equivalent to the standard Direct Form II transposed implementation.
-    The simulator maintains input and output history buffers internally, so the caller
-    only needs to supply the current input at each time step.
     """
 
     def __init__(self, tf, X_0):
@@ -85,7 +81,7 @@ class HybridSim:
     enough to make the integration error negligible compared with sampling effects.
     """
 
-    def __init__(self, StateSpaceModel: LinearStateSpaceModel, config_file):
+    def __init__(self, StateSpaceModel: BaseLinearStateSpaceModel, config_file):
         """Initialises the hybrid simulator with a linear continuous plant.
 
         Args:
@@ -129,30 +125,25 @@ class HybridSim:
 
 
 class NonLinearHybridSim:
-    """Hybrid simulator: nonlinear ball-and-beam plant driven by a discrete controller.
+    """Hybrid simulator: generic nonlinear plant driven by a discrete controller.
 
     Identical structure to ``HybridSim`` but uses the nonlinear ODE ``f(X, u)`` from
-    ``NonlinearBallBeamModel`` instead of the linear state-space matrices.  The plant is
-    integrated at ``dt_plant`` = 1 ms using RK4; the controller output is updated at the
-    coarser ``config_file.dt``.
-
-    The output matrix C = [[1, 0]] selects the ball position r from the state vector
-    X = [[r], [ṙ]].
+    a ``BaseNonlinearModel`` subclass instead of linear state-space matrices.  The plant
+    is integrated at ``dt_plant`` = 1 ms using RK4; the controller output is updated at
+    the coarser ``config_file.dt``.  The output matrix C is read from the model.
     """
 
-    def __init__(self, model: NonlinearBallBeamModel, config_file):
+    def __init__(self, model: BaseNonlinearModel, config_file):
         """Initialises the nonlinear hybrid simulator.
 
         Args:
-            model (NonlinearBallBeamModel): Nonlinear ball-and-beam model; its ``f`` method
-                is used as the ODE right-hand side.
+            model (BaseNonlinearModel): Nonlinear plant model; its ``f`` method is used
+                as the ODE right-hand side and its ``C`` attribute as the output matrix.
             config_file: Plant configuration module; must expose ``T`` (total simulation time [s])
                 and ``dt`` (controller sampling period [s]).
         """
         self.dynamics = model.f
-
-        # Output matrix: y = C·X extracts ball position r from state [r, ṙ]ᵀ.
-        self.C = np.array([[1, 0]])
+        self.C = np.array(model.C, dtype=float)
 
         # Integration step for the continuous plant (same as HybridSim: 1 ms / 1 kHz).
         self.dt_plant = 1e-3

@@ -66,44 +66,37 @@ class DiscretePID:
         return self.controller_sim.step(e)
 
     def As_TransferFunction(self, text_option: str):
-        """Builds the discrete PID transfer function using backward Euler discretisation.
+        """Builds the discrete PID transfer function (position form, backward Euler).
 
-        Two modes are available:
+        Both modes share the same P and I terms (backward Euler, s => (z−1)/(dt·z)):
+            P(z) = Kp
+            I(z) = Ki·dt·z / (z − 1)
 
         ``"filtered"``
-            Constructs the controller as P + I + D where the derivative term includes a
-            first-order low-pass filter with filter coefficient N = 50.  The filter
-            bandwidth is N / dt rad/s (≈ 2500 rad/s at dt = 0.02 s), which attenuates
-            high-frequency noise amplified by differentiation while still providing
-            adequate phase lead.  Discrete forms (backward Euler, s → (z−1)/(dt·z)):
-                P(z) = kp
-                I(z) = ki·dt / (z − 1)
-                D(z) = kd·N·(z − 1) / ((N·dt + 1)·z − 1)
+            Derivative with first-order low-pass filter (N = 50):
+            D(z) = Kd·N·(z − 1) / ((N·dt + 1)·z − 1)
+            Filter pole at z = 1/(1 + N·dt) — always inside the unit circle.
 
         Any other value (default ``"NotFiltered"``)
-            Direct backward-Euler PID with coefficients:
-                b0 = kp + ki·dt + kd/dt
-                b1 = −kp − 2·kd/dt
-                b2 = kd/dt
-            Transfer function: C(z) = (b0·z² + b1·z + b2) / (z² − z)
+            Pure backward-Euler derivative (no filter):
+            D(z) = Kd·(z − 1) / (dt·z)
 
         Args:
-            text_option (str): Mode selector; ``"filtered"`` or anything else.
+            text_option (str): ``"filtered"`` or anything else.
 
         Returns:
-            ct.TransferFunction: Discrete transfer function of the PID controller.
+            ct.TransferFunction: Discrete PID transfer function.
         """
+        P = ct.TransferFunction([self.kp], [1], self.dt)
+        I = ct.TransferFunction([self.ki * self.dt, 0], [1, -1], self.dt)
+
         if text_option == "filtered":
-            N = 50  # derivative filter coefficient: filter bandwidth = N/dt rad/s
-            P = ct.TransferFunction([self.kp], [1], self.dt)
-            I = ct.TransferFunction([self.ki * self.dt], [1, -1], self.dt)
+            N = 50
             D = ct.TransferFunction([self.kd * N, -self.kd * N], [N * self.dt + 1, -1], self.dt)
-            return P + I + D
         else:
-            b0 = self.kp + self.ki * self.dt + self.kd / self.dt
-            b1 = -self.kp - (2 * self.kd / self.dt)
-            b2 = self.kd / self.dt
-            return ct.TransferFunction([b0, b1, b2], [1, -1], self.dt)
+            D = ct.TransferFunction([self.kd / self.dt, -self.kd / self.dt], [1, 0], self.dt)
+
+        return P + I + D
 
     def As_RST(self):
         """Converts the PID transfer function into equivalent R, S, T polynomials.
