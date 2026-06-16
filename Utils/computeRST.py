@@ -222,6 +222,7 @@ def Compute_Denominator_Matching_RST(A_cl: list, plant_discrete_tf, Integrator=T
     # ------------------------------------------------------------
     if len(A_cl_total) <= target_len:
         # Direct solve: A_cl_total fits — target the full polynomial.
+        print('Direct Solve Used')
         rhs = np.r_[np.zeros(target_len - len(A_cl_total)), A_cl_total]
         theta, *_ = np.linalg.lstsq(M, rhs, rcond=None)
         S_tilde = theta[:nS]
@@ -232,6 +233,7 @@ def Compute_Denominator_Matching_RST(A_cl: list, plant_discrete_tf, Integrator=T
             S_coeffs = S_tilde
     else:
         # Two-step Landau: target A_m, then apply A0 factorisation.
+        print('Two step used ')
         A_m_padded = np.r_[np.zeros(target_len - len(A_m)), A_m]
         theta, *_ = np.linalg.lstsq(M, A_m_padded, rcond=None)
         S_tilde_prime = theta[:nS]
@@ -305,6 +307,7 @@ def Compute_Denominator_Matching_RST(A_cl: list, plant_discrete_tf, Integrator=T
         print("Closed-loop DC gain: undefined (pole at z=1)")
     else:
         print("Closed-loop DC gain:", ct.dcgain(H_cl))
+    print("Closed-loop zeros (z):",np.roots(H_cl.num_list[0][0]))
     print("Closed-loop poles (z):", np.roots(H_cl.den_list[0][0]))
     print("Pole radii:           ", np.abs(np.roots(H_cl.den_list[0][0])))
     return S_tf, R_tf, T_tf, H_cl
