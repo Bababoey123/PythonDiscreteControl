@@ -395,7 +395,7 @@ from Simulation.runners import run_discrete_control
 log = run_discrete_control(
     plant_sim, controller, ballbeam_config,
     r=1.0, y_0=0.0, logger=SimLog(),
-    Disturb=False,   # True: adds step disturbance of 2.0 after t = 3 s
+    Disturb=False,   # True: step input disturbance of 2.0 added to plant input from t = 3 s onward
     Saturate=True    # True: clips u to [−10, +10]
 )
 ```
@@ -421,7 +421,7 @@ from Simulation.runners import run_continuous_control_loop
 log = run_continuous_control_loop(
     hybrid_or_nl_sim, controller, r=1.0, X_0=np.array([[0],[0]]),
     Logger=SimLog(),
-    Disturb=False,   # True: adds step disturbance of 2.0 after t = 3 s
+    Disturb=False,   # True: step input disturbance of 2.0 added to plant input from t = 3 s onward
     Saturate=True    # True: clips u to [−10, +10]
 )
 ```
@@ -468,6 +468,8 @@ m.Stability(open_loop_tf)            # prints gain margin and phase margin
 ```
 
 `response_data` analyses only the pre-disturbance phase (`t ≤ 3 s`). Rise time uses the standard 10 %→90 % IEEE definition; settling time uses a ±10 % tolerance band.
+
+> **Note on disturbance type**: when `Disturb=True`, runners inject a **constant step input disturbance** — a value of 2.0 is added to the plant input `u + d` for all samples from t = 3 s onward. The logged control signal is the raw controller output (without `d`). RST enforces `S(1) = 0`, so the steady-state position error is exactly zero. A PID without integral action (`Ki = 0`) settles with a permanent offset ≈ `D / Kp` — a qualitative difference that makes this disturbance type the most informative for comparing the two controllers.
 
 ---
 

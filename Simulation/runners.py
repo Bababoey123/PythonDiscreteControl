@@ -7,9 +7,11 @@ the primary interface point for users of this library.
 Hardcoded values shared by all runners
 ---------------------------------------
 Disturbance magnitude : 2.0 (same units as the control input)
-    A step disturbance of 2.0 is injected at the plant input after t = 3 s.  This value
-    was chosen to produce a visible but not destabilising perturbation for the ball-and-beam
-    system, where the nominal control authority is ±10 units.
+    A constant step disturbance of 2.0 is added to the plant input for all samples after
+    t = 3 s.  The plant receives ``u + d`` while the logged control signal is the raw
+    controller output.  Because RST enforces S(1) = 0 (integrator in S), the steady-state
+    position error is exactly zero.  A PID without integral action (Ki = 0) settles with a
+    permanent offset of approximately D * S(1) / R(1) ≈ D / Kp.
 
 Disturbance onset : t > 3.0 s
     The first 3 s are reserved for the reference-tracking transient.  The disturbance is
@@ -56,8 +58,10 @@ def run_discrete_control(
     Hardcoded values
     ----------------
     Disturbance magnitude : 2.0
-        A step of 2.0 is added to the plant input u[k] once ``k·dt > 3.0 s``.
-        See the module docstring for the rationale.
+        A step disturbance of 2.0 is added to the plant input ``u + d`` for all samples
+        ``k >= int(3.0 / dt)``.  The logged control signal is the raw controller output.
+        RST (S(1) = 0) returns the position to ``r`` exactly; PID (Ki = 0) settles with
+        a permanent offset ≈ D / Kp.  See the module docstring for the rationale.
     Saturation limits : [−10, +10]
         The raw controller output is clipped to this range before being sent to the plant.
         See the module docstring for the rationale.
@@ -70,8 +74,8 @@ def run_discrete_control(
         r (float): Reference (setpoint) for the controller.
         y_0 (float): Initial plant output.
         logger (SimLog): SimLog instance used to record time, output, and input.
-        Disturb (bool, optional): If True, adds a step disturbance of 2.0 to the plant
-            input after t = 3 s.  Defaults to True.
+        Disturb (bool, optional): If True, adds a step input disturbance of 2.0 to the
+            plant input for all samples from t = 3 s onward.  Defaults to True.
         Saturate (bool, optional): If True, clips the control signal to [−10, +10].
             Defaults to True.
 
@@ -84,15 +88,17 @@ def run_discrete_control(
     u = 0.0
     y = y_0
 
+    k_step = int(3.0 / config_file.dt)
     plant_sim.reset(y_0)
     for k in range(N):
-        d = 2.0 if (Disturb and k * config_file.dt > 3.0) else 0.0
+        d = 2.0 if (Disturb and k >= k_step) else 0.0
         u = controller.step(y)
         if Saturate:
             u = float(np.clip(u, -10.0, +10.0))
-        y = plant_sim.step(u + d)
+        y_plant = plant_sim.step(u + d)  # disturbance at plant input
+        y = y_plant
 
-        logger.log((k + 1) * config_file.dt, np.array([y]), np.array([u]))
+        logger.log((k + 1) * config_file.dt, np.array([y_plant]), np.array([u]))
 
     return logger
 
@@ -197,8 +203,11 @@ def run_continuous_control_loop(
     Hardcoded values
     ----------------
     Disturbance magnitude : 2.0
-        A step disturbance of 2.0 is added to the plant input once t > 3.0 s.
-        See the module docstring for the rationale.
+        A step disturbance of 2.0 is added to the controller output before it is sent
+        to the plant for all control periods starting at t = 3 s.  The plant receives
+        ``u + d`` via ``u_k``; the logged control signal is the raw controller output.
+        RST (S(1) = 0) returns to ``r`` exactly; PID (Ki = 0) settles with a permanent
+        offset ≈ D / Kp.  See the module docstring for the rationale.
     Saturation limits : [−10, +10]
         The controller output is clipped to this range before the ZOH hold.
         See the module docstring for the rationale.
@@ -211,8 +220,8 @@ def run_continuous_control_loop(
         r: Reference (setpoint) for the controller.
         X_0: Initial state vector of the continuous plant.
         Logger (SimLog): SimLog instance used to record time, output, and input.
-        Disturb (bool, optional): If True, adds a step disturbance of 2.0 to the plant
-            input after t = 3 s.  Defaults to True.
+        Disturb (bool, optional): If True, adds a step input disturbance of 2.0 to the
+            plant input from t = 3 s onward.  Defaults to True.
         Saturate (bool, optional): If True, clips the control signal to [−10, +10].
             Defaults to True.
 
@@ -229,21 +238,16 @@ def run_continuous_control_loop(
     u_k = np.array([[0.0]], dtype=float)
 
     while t < Simulator.config_file.T:
+        d_in = 2.0 if (Disturb and t >= 3.0) else 0.0
         y_k = float(np.squeeze(Simulator.C @ X))
 
         u_scalar = float(controller.step(y_k))
         if Saturate:
             u_scalar = float(np.clip(u_scalar, -10.0, +10.0))
-        u_k = np.array([[u_scalar]], dtype=float)
+        u_k = np.array([[u_scalar + d_in]], dtype=float)  # disturbance at plant input
 
         for _ in range(N_substep):
-            if Disturb and t > 3.0:
-                d = np.array([[2.0]])
-            else:
-                d = np.array([[0.0]])
-
-            u_plant = u_k + d
-            X = Simulator.rk4_step(X, u_plant)
+            X = Simulator.rk4_step(X, u_k)
 
             t += Simulator.dt_plant
 
