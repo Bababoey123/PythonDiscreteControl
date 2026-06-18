@@ -109,12 +109,5 @@ class Metrics:
         margins = ct.stability_margins(TF)
         gm, pm = margins[0], margins[1]
         gm_db = 20 * np.log10(gm)
-        print(f"Gain margin:   {gm_db:.1f} dB  (linear ratio ×{gm:.3f})")
-        print(f"Phase margin:  {pm:.1f}°")
-        if gm_db < 0:
-            destabilising_factor = 1.0 / gm
-            print(
-                f"  ↳ Negative gain margin: stable only above the minimum gain.\n"
-                f"    Instability if plant gain drops by more than {destabilising_factor:.1f}× "
-                f"({100 * (1 - gm):.0f}% reduction from nominal)."
-            )
+        print(f"Gain margin:   {gm_db:.1f} dB")
+        print(f"Phase margin:  {pm:.1f} deg")
