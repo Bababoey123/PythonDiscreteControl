@@ -411,9 +411,8 @@ def Compute_Desired_RST(Desired_TF, plant_discrete_tf, Integrator=True, A0=None)
             f"(max degree {target_len - 1}). Reduce the desired TF denominator degree. "
             "A0 observer poles do not consume this budget."
         )
-    A_m_padded = np.r_[np.zeros(target_len - len(A_m)), A_m]
 
-    # Stability check on total polynomial
+    # Stability check on user-specified poles (before any dead-beat fill)
     poles_total = np.roots(A_cl_total)
     if np.any(np.abs(poles_total) > 1.0 + 1e-8):
         raise ValueError(
@@ -427,10 +426,30 @@ def Compute_Desired_RST(Desired_TF, plant_discrete_tf, Integrator=True, A0=None)
             UserWarning
         )
 
+    # Dead-beat fill: if A_m is shorter than the Diophantine capacity, append
+    # trailing zeros (poles at z=0) rather than leading zeros.
+    #
+    # WHY trailing, not leading: leading zeros force the first Diophantine equation
+    # to "s0 + b·r0 = 0", making S[0] < 0. A negative S[0] inverts the 1/S filter
+    # sign in RSTController and causes the closed-loop simulation to diverge.
+    # Trailing zeros shift the polynomial right without touching the leading coefficient,
+    # preserving S[0] > 0. The added poles sit at z=0 and decay in a single step.
+    slack = target_len - len(A_m)
+    if slack > 0:
+        A_m = np.r_[A_m, np.zeros(slack)]
+        A_cl_total = trim(np.convolve(A_m, A0))
+        warnings.warn(
+            f"Desired denominator A_m (degree {len(A_m) - 1 - slack}) is {slack} degree(s) "
+            f"below the Diophantine system capacity (degree {target_len - 1}). "
+            f"{slack} dead-beat pole(s) at z=0 added automatically to A_m. "
+            "Pass a higher-degree desired denominator to suppress this warning.",
+            UserWarning
+        )
+
     # ------------------------------------------------------------
     # 4. Solve reduced Diophantine for S_tilde', R'
     # ------------------------------------------------------------
-    theta, *_ = np.linalg.lstsq(M, A_m_padded, rcond=None)
+    theta, *_ = np.linalg.lstsq(M, A_m, rcond=None)
     S_tilde_prime = theta[:nS]
     R_prime = theta[nS:]
 

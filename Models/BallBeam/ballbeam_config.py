@@ -35,7 +35,7 @@ J = 9.99e-6   # kg·m^2 — ball moment of inertia (solid sphere approximation)
 d = 0.03      # m   — lever arm: pivot to servo attachment point
 L = 1.0       # m   — total beam length
 
-dt = 1 / 50   # s   — controller sampling period (50 Hz)
+dt = 1 / 20   # s   — controller sampling period (20 Hz)
 T = 3         # s   — total simulation duration
 
 # Linearised plant gain

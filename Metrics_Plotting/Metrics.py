@@ -66,16 +66,55 @@ class Metrics:
         print(f"Temps d'établissement :     {settling_time:.3f} s  (bande ±10 %)")
 
     def Stability(self, TF: ct.TransferFunction):
-        """Prints the gain margin and phase margin of an open-loop transfer function.
+        """Prints gain margin and phase margin with interpretation notes.
 
-        Uses ``control.stability_margins`` to compute both margins in one call, then
-        converts the gain margin from a linear ratio to decibels.
+        **Positive gain margin (GM > 0 dB)**
+            The loop gain can be *increased* by the factor 10^(GM/20) before the
+            closed loop becomes unstable.  A design target of GM > 6 dB means the
+            plant gain could double and the system would still be stable.
+
+        **Negative gain margin (GM < 0 dB) — conditional stability**
+            The closed loop is stable, but it requires a *minimum* gain to remain so.
+            This is **conditionally stable** behaviour: the system is stable only inside
+            a gain interval [K_min, K_max], not for all gains above a threshold.
+
+            Why it happens here — triple integrator open loop:
+              The ball-and-beam plant is a double integrator A(z) = (z−1)².  The RST
+              controller adds a third integrator by forcing S(1) = 0, i.e. S contains a
+              factor (z−1).  The resulting open loop L(z) = B·R/(A·S) has a triple pole
+              at z = 1, equivalent to three cascaded discrete integrators.
+
+              For a type-3 open loop, the Nyquist locus starts at angle +90° as ω→0⁺
+              (because (e^{jω}−1)³ ≈ (jω)³ = −j·ω³, whose phase is −(−90°) = +90° in
+              the denominator), then sweeps to zero at ω = π via the zero at z = −1 in
+              B(z).  The locus crosses the negative real axis to the LEFT of −1 at some
+              intermediate frequency, which means the Nyquist criterion requires a
+              specific number of encirclements: too little gain and the required
+              encirclement count is not met, making the closed loop unstable.
+
+              A negative gain margin is therefore a structural property of any type-3
+              (or higher) feedback loop — not a consequence of the RST synthesis method
+              or a design trade-off.  It cannot be eliminated without removing one of
+              the three integrators.
+
+            What to watch for:
+              The phase margin (typically 60°–80° for well-tuned RST) is the relevant
+              robustness indicator for this class of system.  The lower gain boundary
+              is worth knowing: if the plant gain H could drop significantly (mass
+              change, actuator wear), check that the nominal gain stays above K_min.
 
         Args:
-            TF (ct.TransferFunction): Open-loop discrete or continuous transfer function
-                whose stability margins are to be evaluated.
+            TF (ct.TransferFunction): Open-loop discrete or continuous transfer function.
         """
         margins = ct.stability_margins(TF)
         gm, pm = margins[0], margins[1]
-        print(f"Gain margin:   {20 * np.log10(gm):.1f} dB  (×{gm:.2f})")
+        gm_db = 20 * np.log10(gm)
+        print(f"Gain margin:   {gm_db:.1f} dB  (linear ratio ×{gm:.3f})")
         print(f"Phase margin:  {pm:.1f}°")
+        if gm_db < 0:
+            destabilising_factor = 1.0 / gm
+            print(
+                f"  ↳ Negative gain margin: stable only above the minimum gain.\n"
+                f"    Instability if plant gain drops by more than {destabilising_factor:.1f}× "
+                f"({100 * (1 - gm):.0f}% reduction from nominal)."
+            )
